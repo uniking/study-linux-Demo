@@ -55,7 +55,6 @@ int main(int argc, char **argv)
 	not!! Be sure you know the rules of the network you are running on
 	before you set your card in promiscuous mode!!     */
 
-	//打开捕获设备DEV_1， 所有的捕获  混杂模式  无限等待  出错buffer
 	descr = pcap_open_live(DEV_1,65535,1, 0,errbuf);
 
 	if(descr == NULL)
