@@ -1,0 +1,1 @@
+需要配置syslogd或rsyslogd的配置文件

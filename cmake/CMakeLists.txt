@@ -1,0 +1,6 @@
+#add_library(file_parser SHARED Test.cpp)
+set(executable_output_path ./bin)
+link_directories(../lib)
+add_executable(test Test.cpp)
+target_link_libraries(test myadd)
+install(test)

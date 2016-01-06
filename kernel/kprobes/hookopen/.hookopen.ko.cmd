@@ -1,0 +1,1 @@
+cmd_/home/sxis/workspace/kernel/kprobes/hookopen/hookopen.ko := ld -r -m elf_x86_64 -T /usr/src/kernels/3.10.0-229.14.1.el7.x86_64/scripts/module-common.lds --build-id  -o /home/sxis/workspace/kernel/kprobes/hookopen/hookopen.ko /home/sxis/workspace/kernel/kprobes/hookopen/hookopen.o /home/sxis/workspace/kernel/kprobes/hookopen/hookopen.mod.o

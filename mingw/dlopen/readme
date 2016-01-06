@@ -1,0 +1,2 @@
+无法实现dlopen到LoadLibary的转换
+mingw没有dlfcn.h
