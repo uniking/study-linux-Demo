@@ -2,6 +2,7 @@
 Created on Sep 16, 2010
 kNN: k Nearest Neighbors
 
+
 Input:      inX: vector to compare to existing dataset (1xN)
             dataSet: size m data set of known vectors (NxM)
             labels: data set labels (1xM vector)
@@ -42,11 +43,12 @@ def file2matrix(filename):
     fr = open(filename)
     index = 0
     for line in fr.readlines():
-        line = line.strip()
-        listFromLine = line.split('\t')
-        returnMat[index,:] = listFromLine[0:3]
-        classLabelVector.append(int(listFromLine[-1]))
-        index += 1
+	line = line.strip()
+	line = line.strip('/n')
+	listFromLine = line.split('\t')
+	returnMat[index,:] = listFromLine[0:3]
+	classLabelVector.append((listFromLine[-1]))
+	index += 1
     return returnMat,classLabelVector
     
 def autoNorm(dataSet):
