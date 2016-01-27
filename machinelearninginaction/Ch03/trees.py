@@ -18,15 +18,19 @@ def createDataSet():
 
 def calcShannonEnt(dataSet):
     numEntries = len(dataSet)
+    print(numEntries)
+    print('create dic')
     labelCounts = {}
     for featVec in dataSet: #the the number of unique elements and their occurance
         currentLabel = featVec[-1]
-        if currentLabel not in labelCounts.keys(): labelCounts[currentLabel] = 0
+        if currentLabel not in labelCounts.keys():
+		labelCounts[currentLabel] = 0
         labelCounts[currentLabel] += 1
     shannonEnt = 0.0
     for key in labelCounts:
         prob = float(labelCounts[key])/numEntries
         shannonEnt -= prob * log(prob,2) #log base 2
+        print(key, labelCounts[key], prob, shannonEnt)
     return shannonEnt
     
 def splitDataSet(dataSet, axis, value):
