@@ -17,6 +17,7 @@ def createDataSet():
     #change to discrete values
     return dataSet, labels
 
+#all show as digit
 def file2List(filename):
     fr = open(filename)
     numberOfLines = len(fr.readlines())         #get the number of lines in the file
@@ -28,6 +29,7 @@ def file2List(filename):
 	line = line.strip()
 	line = line.strip('/n')
 	listFromLine = line.split('\t')
+        print listFromLine
 	returnMat[index,:] = listFromLine[0:3]
 	classLabelVector.append((listFromLine[-1]))
 	index += 1
@@ -42,6 +44,20 @@ def file2List(filename):
         DataList.append(DataOne)
     return DataList,classLabelVector
 
+#all show as string
+def file2strlist(filename):
+    fr = open(filename)
+    numberOfLines = len(fr.readlines())         #get the number of lines in the file
+    DataList = []
+    classLabelVector = []                       #prepare labels return   
+    fr = open(filename)
+    index = 0
+    for line in fr.readlines():
+	line = line.split()
+        DataList.append(line)
+	classLabelVector.append((line[-1]))
+
+    return DataList,classLabelVector
 
 def calcShannonEnt(dataSet):
     numEntries = len(dataSet)
