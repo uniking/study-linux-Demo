@@ -23,3 +23,9 @@ def lwlrplot(yHat, xArr, yArr):
     ax.plot(xSort[:,1], yHat[srtInd])
     ax.scatter(xMat[:,1].flatten().A[0], mat(yArr).T.flatten().A[0], s=2, c='red')
     plt.show()
+
+def printline(line):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(line)
+    plt.show()
