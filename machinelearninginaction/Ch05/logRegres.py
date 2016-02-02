@@ -25,9 +25,21 @@ def gradAscent(dataMatIn, classLabels):
     maxCycles = 500
     weights = ones((n,1))
     for k in range(maxCycles):              #heavy on matrix operations
+        '''
+        dataMatrix*weights biao shi Y=wX, Y shi gu ji zhi.
+        h wei gu ji zhi de fen lei jie guo.
+        '''
         h = sigmoid(dataMatrix*weights)     #matrix mult
+        #zhen shi lei bie yu gu ji lei bie de cha zhi.
         error = (labelMat - h)              #vector subtraction
+        print 'k=',k
+        print 'weights=',weights
+        print 'h=',h
+        print 'error=',error
+        #'weights' wei jie. 
+        #'alpha * dataMatrix.transpose()* error' biao shi ti du zhi.
         weights = weights + alpha * dataMatrix.transpose()* error #matrix mult
+    print 'labelMat=',labelMat
     return weights
 
 def plotBestFit(weights):
@@ -44,10 +56,14 @@ def plotBestFit(weights):
             xcord2.append(dataArr[i,1]); ycord2.append(dataArr[i,2])
     fig = plt.figure()
     ax = fig.add_subplot(111)
+    print 'to add scatter'
     ax.scatter(xcord1, ycord1, s=30, c='red', marker='s')
     ax.scatter(xcord2, ycord2, s=30, c='green')
     x = arange(-3.0, 3.0, 0.1)
     y = (-weights[0]-weights[1]*x)/weights[2]
+    print 'x=',x
+    print 'y=',y
+    print 'to add line'
     ax.plot(x, y)
     plt.xlabel('X1'); plt.ylabel('X2');
     plt.show()
@@ -92,6 +108,7 @@ def colicTest():
         trainingSet.append(lineArr)
         trainingLabels.append(float(currLine[21]))
     trainWeights = stocGradAscent1(array(trainingSet), trainingLabels, 1000)
+    print 'trainWeights=',trainWeights
     errorCount = 0; numTestVec = 0.0
     for line in frTest.readlines():
         numTestVec += 1.0
@@ -105,6 +122,10 @@ def colicTest():
     print "the error rate of this test is: %f" % errorRate
     return errorRate
 
+# xiao guo he numTests mei guan xi.
+# yin wei stocGradAscent1 mei ci die dai ci shu he bu chang dou yi yang.
+# suo yi jie X ye cha bu duo
+# yao xiang ti gao zheng que lv, jiu yao cong stocGradAscent1 ru shou.
 def multiTest():
     numTests = 10; errorSum=0.0
     for k in range(numTests):
