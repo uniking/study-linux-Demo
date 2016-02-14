@@ -96,7 +96,7 @@ def stageWise(xArr,yArr,eps=0.01,numIt=100):
     yMat = yMat - yMean     #can also regularize ys but will get smaller coef
     xMat = regularize(xMat)
     m,n=shape(xMat)
-    #returnMat = zeros((numIt,n)) #testing code remove
+    returnMat = zeros((numIt,n)) #testing code remove
     ws = zeros((n,1)); wsTest = ws.copy(); wsMax = ws.copy()
     for i in range(numIt):
         print ws.T
@@ -111,8 +111,8 @@ def stageWise(xArr,yArr,eps=0.01,numIt=100):
                     lowestError = rssE
                     wsMax = wsTest
         ws = wsMax.copy()
-        #returnMat[i,:]=ws.T
-    #return returnMat
+        returnMat[i,:]=ws.T
+    return returnMat
 
 #def scrapePage(inFile,outFile,yr,numPce,origPrc):
 #    from BeautifulSoup import BeautifulSoup
