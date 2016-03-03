@@ -52,8 +52,8 @@ VERBOSE_COMMAND:=yes
 
 SOURCE_SUFFIXES:=cpp
 src-y:=testRE2.cpp
-TARGET_TYPE:=SO
-TARGET:=libmytest.so
+TARGET_TYPE:=EXE
+TARGET:=testRE2
 LIBS:=-lre2
 
 ifndef DEFINES
