@@ -26,7 +26,7 @@ void printlog(bool bT)
 
 int main()
 {
-	ifstream inFile("./3.txt");
+	ifstream inFile("./phone.txt");
 	string sContent;
 	ostringstream os;
 	os << inFile.rdbuf();
@@ -53,8 +53,9 @@ int main()
     int i=0;
    re2::StringPiece input((char*)sContent.c_str());
    //re2::StringPiece input("11111111111111111111111111111");
-	while(RE2::FindAndConsume(&input, "(\\d{18})", &strTemp))
+	//while(RE2::FindAndConsume(&input, "(\\d{11})", &strTemp))
 	//while(RE2::FindAndConsume(&input, "(\\d{3}\\-\\d{7})", &strTemp))
+    while(RE2::FindAndConsume(&input, "(函数|执行|)", &strTemp))
 	{
 		i++;
 		cout<< endl<<strTemp.c_str()<<endl;
