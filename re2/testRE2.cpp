@@ -26,12 +26,13 @@ void printlog(bool bT)
 
 int main()
 {
-	ifstream inFile("./1.txt");
+	ifstream inFile("./3.txt");
 	string sContent;
 	ostringstream os;
 	os << inFile.rdbuf();
 	sContent = os.str();
 	bool bT;
+    cout<<sContent<<endl;
 
 	//RE2 sear("");
 	//int s = clock () ;
@@ -47,6 +48,20 @@ int main()
 	//bT = RE2::PartialMatch((char*)(sContent.c_str()), "123456789123456789");
 	//sleep(10);
 	//int e = clock () ;
+
+    string strTemp="";
+    int i=0;
+   re2::StringPiece input((char*)sContent.c_str());
+   //re2::StringPiece input("11111111111111111111111111111");
+	while(RE2::FindAndConsume(&input, "(\\d{18})", &strTemp))
+	//while(RE2::FindAndConsume(&input, "(\\d{3}\\-\\d{7})", &strTemp))
+	{
+		i++;
+		cout<< endl<<strTemp.c_str()<<endl;
+	}
+
+
+/*
 	int i=0;
 	char temp[32] = {0};
 	char c1=0;
@@ -60,7 +75,10 @@ int main()
 		cout<<i<<" "<<temp <<" "<<di<<" "<< strTemp.c_str()<<endl;
 		temp[0]=0;
 	}
+*/
 
+
+/*
 	re2::StringPiece input2("xxxxx132874525652236578xxxxxxx77777777778xxxx010-5784125xxxxx020-1234567");
 	while(RE2::FindAndConsume(&input2, "(\\d{18})", &strTemp))
 	{
@@ -73,13 +91,15 @@ int main()
 	{
 		printlog(bT);
 	}
-
+*/
 	
 	//while(RE2::Consume(&input, "123456", temp))
 	//{
 	//	i++;
 	//	cout<<i<<" ";
 	//}
+
+/*
 	cout<<endl;
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
 
@@ -87,6 +107,7 @@ int main()
 	//cout<<"tiem="<<e-s<<"e="<<e<<" s="<<s<<endl;
 	//cout<<diff(time1, time2).tv_sec<<":"<<diff(time1, time2).tv_nsec<<endl;
 	cout<<"time="<<time2.tv_nsec-time1.tv_nsec<<endl;
+*/
 
 	//int num=0;
 	//string ph;
@@ -97,11 +118,14 @@ int main()
 	//RE2::FullMatch("hello", "h.*o");
 
 	//匹配多个关键字
+
+/*
 	if(bT =RE2::PartialMatch("中华人们共和国，北京市，海淀区","北京|海淀"))
 	{
 		printf("多关键字:");
 		printlog(bT);
 	}
+*/
 
 /*
 	//多次抽取，多个关键字
