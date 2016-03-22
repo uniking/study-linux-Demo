@@ -1,4 +1,5 @@
 #include "goods_pool.hpp"
+#include <errno.h>
 
 int CGoodsPool::set_semvalue()
 {
@@ -18,11 +19,17 @@ int CGoodsPool::semaphore_p()
 	sem_b.sem_num = 0;
 	sem_b.sem_op = -1;
 	sem_b.sem_flg = SEM_UNDO;
-	if(semop(m_sem_id, &sem_b, 1) == -1)
-	{
-		printf("semaphore_p error\n");
-		return 1;
-	}
+
+    while(semop(m_sem_id, &sem_b, 1) == -1)
+    {
+        if(errno == EINTR)
+                continue;// interupted system call错误，
+            else
+        {
+            printf("semaphore_p error %m\n");
+                exit(-1);
+        }
+    }
 
 	return 0;
 }
@@ -33,11 +40,17 @@ int CGoodsPool::semaphore_v()
 	sem_b.sem_num = 0;
 	sem_b.sem_op = 1;
 	sem_b.sem_flg = SEM_UNDO;
-	if(semop(m_sem_id, &sem_b, 1) == -1)
-	{
-		printf("semaphore_v error\n");
-		return 1;
-	}
+
+    while(semop(m_sem_id, &sem_b, 1) == -1)
+    {
+        if(errno == EINTR)
+                continue;
+            else
+        {
+            printf("semaphore_p error %m\n");
+                exit(-1);
+        }
+    }
 
 	return 0;
 }

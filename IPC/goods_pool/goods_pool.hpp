@@ -17,8 +17,8 @@ using namespace std;
 
 #define FIFO_NAME "/tmp/my_fifo"
 
-//#define GOODS void*
-#define GOODS int
+#define GOODS void*
+//#define GOODS int
 #define GOODS_POOL list< GOODS >
 
 // for thread
