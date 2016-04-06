@@ -1,4 +1,4 @@
-package org.shirdrn.storm.examples;
+package hello;
 
 import java.util.Arrays;
 import java.util.HashMap;
