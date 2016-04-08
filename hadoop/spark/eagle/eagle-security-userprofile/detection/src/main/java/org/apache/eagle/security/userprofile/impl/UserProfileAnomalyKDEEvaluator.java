@@ -116,7 +116,7 @@ public class UserProfileAnomalyKDEEvaluator extends AbstractUserProfileKDEEvalua
             callBackResult.setContext(context);
             //LOG.info("probability estimation for data @" + i + " is: " + probabilityEstimation[i]);
             if(probabilityEstimation[i] < aModel.maxProbabilityEstimate()){
-                callBackResult.setAnomaly(true);
+                callBackResult.setAnomaly(true);//标记为匿名，原因是其中的一个行为的概率密度小于最大的概率密度
                 for(int col = 0 ; col < anomalyFeature[i].length; col++){
                     //LOG.info("feature anomaly? " + (featureVals[col] == true));
                     if(anomalyFeature[i][col] == true){

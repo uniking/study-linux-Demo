@@ -108,3 +108,89 @@ kde计算过程
         }
         
 那可以总结下这个用户画像模型：1，作某件事的均值和方差 2，某组事件发生的概率
+
+-------------------------
+使用用户画像模型
+UserActivityAggregator.java 用户行为聚合
+UserProfileAnomalyDetector.java 匿名行为检测
+
+可使用在
+UserProfileDetectionBatchMain.java 批处理中（非时时 storm）
+UserProfileDetectionStreamMain.java 流中（时时 storm）
+
+实现文件
+/home/sxis/study-linux-Demo/hadoop/spark/eagle/eagle-security-userprofile/detection/src/main/java/org/apache/eagle/security/userprofile/impl/UserProfileAnomalyKDEEvaluator.java
+
+要做的事情：
+1，收集用户行为，为一组动作。（一组动作-》一个行为）
+收集n组动作
+比如
+10 805 60 93
+13 825 62 93
+10 855 68 90
+如果不是行为组，没法计算行为的概率密度。
+
+2，对挨个对动作进行均值，方差判断
+上面进行3*4=12此判断，标记是不是正常的动作。
+
+3，判断是不是匿名
+判断概率密度
+
+for(int i=0; i<inputData.getRowDimension();i++){
+            List<String> cmds = JavaConversions.seqAsJavaList(userActivity.cmdTypes());
+            if(inputData.getColumnDimension() != cmds.size()){
+                LOG.error("Test data is not with same dimension as training, aborting...");
+                return null;
+            }else{
+
+                UserCommandStatistics[] listStats = aModel.statistics();
+
+                for(int j=0; j < inputData.getColumnDimension(); j++){
+//                    LOG.info("mean for j=" + j + " is:" + listStats[j].getMean());
+//                    LOG.info("stddev for j=" + j + " is:" + listStats[j].getStddev());
+                    if(listStats[j].isLowVariant()){
+//                        LOG.info(listStats[j].getCommandName() + " is low variant for user: " + user);
+                        if(inputData.getEntry(i, j) > listStats[j].getMean()){
+                            probabilityEstimation[i]*= Double.NEGATIVE_INFINITY;
+                            anomalyFeature[i][j] = true;
+                        }
+                    }else{
+                        double stddev = listStats[j].getStddev();
+                        //LOG.info("stddev: " + stddev);
+                        double mean = listStats[j].getMean();
+                        //LOG.info("mean: " + mean);
+                        double sqrt2PI = Math.sqrt(2.0*Math.PI);
+                        //LOG.info("sqrt2PI: " + sqrt2PI);
+                        double denominatorFirstPart = sqrt2PI*stddev;
+                        //LOG.info("denominatorFirstPart: " + denominatorFirstPart);
+                        double squareMeanNormal = Math.pow((inputData.getEntry(i, j) - mean), 2);
+                        //LOG.info("squareMeanNormal: " + squareMeanNormal);
+                        double twoPowStandardDev = Math.pow(stddev, 2);
+                        //LOG.info("twoPowStandardDev: " + twoPowStandardDev);
+                        double twoTimesTwoPowStandardDev = 2.0*twoPowStandardDev;
+                        //LOG.info("twoTimesTwoPowStandardDev: " + twoTimesTwoPowStandardDev);
+
+                        double tempVal = ((1.00/denominatorFirstPart)
+                                *(Math.exp(-(squareMeanNormal/twoTimesTwoPowStandardDev))));
+                        probabilityEstimation[i] *= tempVal;
+                        //LOG.info("probabilityEstimation: " + probabilityEstimation[i]);
+                        if((inputData.getEntry(i, j) - mean) > 2*stddev)
+                            anomalyFeature[i][j] = true;
+                    }
+                }
+
+                for(int i=0; i < probabilityEstimation.length;i++){
+            MLCallbackResult callBackResult = new MLCallbackResult();
+            callBackResult.setContext(context);
+            //LOG.info("probability estimation for data @" + i + " is: " + probabilityEstimation[i]);
+            if(probabilityEstimation[i] < aModel.maxProbabilityEstimate()){
+                callBackResult.setAnomaly(true);
+                for(int col = 0 ; col < anomalyFeature[i].length; col++){
+                    //LOG.info("feature anomaly? " + (featureVals[col] == true));
+                    if(anomalyFeature[i][col] == true){
+                        callBackResult.setFeature(aModel.statistics()[col].getCommandName());
+                    }
+                }
+            }else{
+                callBackResult.setAnomaly(false);
+            }
