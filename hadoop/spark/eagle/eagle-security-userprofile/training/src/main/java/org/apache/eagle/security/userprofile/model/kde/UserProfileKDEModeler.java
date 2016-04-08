@@ -38,12 +38,12 @@ public class UserProfileKDEModeler extends JavaUserProfileModeler<UserProfileKDE
     private final String[] cmdTypes;
     private UserCommandStatistics[] statistics;
     private RealMatrix finalMatrixWithoutLowVariantCmds;
-    private RealMatrix covarianceMatrix;
+    private RealMatrix covarianceMatrix;//协方差矩阵
     private double[] probabilityEstimation;
-    private double minProbabilityEstimate;
-    private double maxProbabilityEstimate;
-    private double nintyFivePercentileEstimate;
-    private double medianProbabilityEstimate;
+    private double minProbabilityEstimate;//最小概率估计
+    private double maxProbabilityEstimate;//最大概率估计
+    private double nintyFivePercentileEstimate; //百分之九十五估计？
+    private double medianProbabilityEstimate;//中间概率估计
     private final static Logger LOG = LoggerFactory.getLogger(UserProfileKDEModeler.class);
     private static final double lowVarianceVal= 0.001;
 
@@ -67,7 +67,7 @@ public class UserProfileKDEModeler extends JavaUserProfileModeler<UserProfileKDE
             stats.setCommandName(this.cmdTypes[i]);
             RealVector colData = m.getColumnVector(i);
             StandardDeviation deviation = new StandardDeviation();
-            double stddev = deviation.evaluate(colData.toArray());
+            double stddev = deviation.evaluate(colData.toArray()); //计算 标准差
 
             if(LOG.isDebugEnabled()) LOG.debug("Stddev is NAN ? " + (Double.isNaN(stddev) ? "yes" : "no"));
             if(stddev <= lowVarianceVal)
@@ -76,7 +76,7 @@ public class UserProfileKDEModeler extends JavaUserProfileModeler<UserProfileKDE
                 stats.setLowVariant(false);
 
             stats.setStddev(stddev);
-            Mean mean = new Mean();
+            Mean mean = new Mean(); //计算 均值
             double mu = mean.evaluate(colData.toArray());
             if(LOG.isDebugEnabled()) LOG.debug("mu is NAN ? " + (Double.isNaN(mu)? "yes":"no"));
 

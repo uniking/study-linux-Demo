@@ -1,3 +1,110 @@
+---------------------------------
+测试资源
+/home/sxis/study-linux-Demo/hadoop/spark/eagle/eagle-security-userprofile/training/src/main/resources/
+
+----------------------------------
 eagle 核密度估计代码
 
 /home/sxis/workspace/incubator-eagle/eagle-security/eagle-security-userprofile/
+
+
+kde模型实现
+在文件中实现，
+/home/sxis/study-linux-Demo/hadoop/spark/eagle/eagle-security-userprofile/training/src/main/java/org/apache/eagle/security/userprofile/model/kde/UserProfileKDEModeler.java
+kde算法实现函数为UserProfileKDEModeler::computeProbabilityDensityEstimation
+
+模型导出函数为UserProfileKDEModeler::generate
+
+具体是序列化
+在文件中
+/home/sxis/study-linux-Demo/hadoop/spark/eagle/eagle-security-userprofile/common/src/main/scala/org/apache/eagle/security/userprofile/model/UserProfileModel.scala
+
+/home/sxis/study-linux-Demo/hadoop/spark/eagle/eagle-security-userprofile/common/src/main/scala/org/apache/eagle/security/userprofile/model/UserProfileKDEModel.scala
+
+序列化这个类，形成了
+case class UserProfileKDEModel (
+   override val version:Long,
+   override val site:String,
+   override val user:String,
+   statistics: Array[UserCommandStatistics],
+   minProbabilityEstimate:Double,
+   maxProbabilityEstimate: Double,
+   nintyFivePercentileEstimate: Double,
+   medianProbabilityEstimate: Double
+)
+
+那模型就i是
+   version
+   site
+   user
+   statistics
+   minProbabilityEstimate
+   maxProbabilityEstimate
+   nintyFivePercentileEstimate
+   medianProbabilityEstimate
+   
+   
+---------------------------------------
+kde计算过程
+
+打开chorme次数： 点击最小化次数： 打开淘宝次数： 移动窗口次数
+
+12 845 67 98
+11 800 60 90
+10 820 63 95
+12 833 66 95
+13 800 66 99
+
+以上为假设矩阵，一行为一组用户的行为，一列为同一事件的行为，整个矩阵就是用户的行为描述。
+1，计算statistics
+计算均值和方差，以一列计算呢还是以一行计算呢？很显然以一列计算才有意义，比如打开淘宝次数的均值和方差。
+计算的个数同行为的种类，也就是列的数目。
+        for(int i=0; i<m.getColumnDimension(); i++){
+            UserCommandStatistics stats = new UserCommandStatistics();
+            stats.setCommandName(this.cmdTypes[i]);
+            RealVector colData = m.getColumnVector(i);
+            StandardDeviation deviation = new StandardDeviation();
+            double stddev = deviation.evaluate(colData.toArray()); //计算 标准差
+
+            if(LOG.isDebugEnabled()) LOG.debug("Stddev is NAN ? " + (Double.isNaN(stddev) ? "yes" : "no"));
+            if(stddev <= lowVarianceVal)
+                stats.setLowVariant(true);
+            else
+                stats.setLowVariant(false);
+
+            stats.setStddev(stddev);
+            Mean mean = new Mean(); //计算 均值
+            double mu = mean.evaluate(colData.toArray());
+            if(LOG.isDebugEnabled()) LOG.debug("mu is NAN ? " + (Double.isNaN(mu)? "yes":"no"));
+
+            stats.setMean(mu);
+            statistics[i]=stats;
+        }
+
+2，计算概率估计
+现在就是以一组行为为对象，计算第i组发生的概率
+
+	       |概率密度
+12 845 67 98 ---
+11 800 60 90 -----
+10 820 63 95 ------
+12 833 66 95 ---
+13 800 66 99 ----
+
+        for(int i=0; i < inputMat.getRowDimension(); i++){
+            for(int j=0; j < inputMat.getColumnDimension(); j++){
+                if(statistics[j].getStddev() > 0){
+                    double stddev = statistics[j].getStddev();
+                    double mean = statistics[j].getMean();
+                    double sqrt2PI = Math.sqrt(2.0*Math.PI);
+                    double denominatorFirstPart = sqrt2PI*stddev;
+                    double squareMeanNormal = Math.pow((inputMat.getEntry(i, j) - mean), 2);
+                    double twoPowStandardDev = Math.pow(stddev, 2);
+                    double twoTimesTwoPowStandardDev = 2.0*twoPowStandardDev;
+                    probabilityEstimation[i] *= ((1.00/denominatorFirstPart)
+                            *(Math.exp(-(squareMeanNormal/twoTimesTwoPowStandardDev))));
+                }
+            }
+        }
+        
+那可以总结下这个用户画像模型：1，作某件事的均值和方差 2，某组事件发生的概率

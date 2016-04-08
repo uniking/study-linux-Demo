@@ -1,0 +1,16 @@
+all:
+	g++ -Wall -O0 -g -std=c++11 -I. main.cpp kde.cpp -o kerndens 
+
+clean:
+	rm kerndens *.png *.csv
+
+test:
+	./kerndens data/univariate.csv > uni_pdf.csv
+	./kerndens -p 2 data/univariate.csv > uni_cdf.csv
+	./kerndens -b 1 data/multivariate.csv > matrix_default.csv
+	./kerndens -b 2 data/multivariate.csv > matrix_optimal.csv
+	./kerndens -b 3 data/multivariate.csv > matrix_optimal_safe.csv
+	./kerndens -k 2 data/multivariate.csv > matrix_default_box.csv
+	./kerndens -k 3 data/multivariate.csv > matrix_default_epa.csv
+	./plot.R
+
