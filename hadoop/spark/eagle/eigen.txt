@@ -1,0 +1,50 @@
+eigen用户画像算法
+eigen，特征值，这个特征值是用svd分解数据矩阵得到的。
+（可以去看通过svd进行数据降维的协同推荐算法，把用户的一系列动作看作是一件商品，动作的次数视为商品的打分，新来了一条动作（商品），我们推不推荐给该用户？）
+
+生成模型的关键函数
+            computeCovarianceAndSVD(normalizedInputMatrix, lowVariantColumnCount);//计算协方差和奇异值分解
+            computeDimensionWithMaxVariance();
+            computePrincipalComponents();
+            maximumL2Norm = new ArrayRealVector(principalComponents.length);
+            minimumL2Norm = new ArrayRealVector(principalComponents.length);
+                        for (int i = 0; i < principalComponents.length; i++) {
+                RealMatrix trainingDataTranspose = computeMaxDistanceOnPCs(i);
+            }
+
+            UserProfileEigenModel userprofileEigenModel = new UserProfileEigenModel(
+		  System.currentTimeMillis(),site,user, uMatrix, diagonalMatrix, 
+		  dimension, minVector, maxVector, principalComponents, 
+		  maximumL2Norm, minimumL2Norm, statistics);
+		  
+1，计算协方差和svd
+svd从 Data矩阵=V矩阵*对角矩阵*U矩阵
+2，通过最大的方差计算出纬度
+去对角阵能量的99%
+            sumEach += diagonalMatrix.getEntry(i, i);
+            if((sumEach/sumTotal) >= MAINTENED_VARIANCE){
+                dimension = i;
+3，计算主要组件（缩写为pc）
+U矩阵*对角矩阵=组件
+
+4，计算组件件的距离
+的出最大值maximumL2Norm，最小值minimumL2Norm
+的出距离最大的两个向量minVector，maxVector
+
+5，模型文件（java序列化文件）
+site,
+user, 
+uMatrix, 
+diagonalMatrix, 
+dimension,
+minVector, 
+maxVector, 
+principalComponents, 
+maximumL2Norm, 
+minimumL2Norm, 
+statistics //同kde
+
+--------------------------
+使用模型
+1，如果输入数据，大于模型均值，直接设为匿名操作
+2，计算输入的每个动作与模型中关键组件间的距离，只要存在大于maximumL2Norm的，设为匿名操作。

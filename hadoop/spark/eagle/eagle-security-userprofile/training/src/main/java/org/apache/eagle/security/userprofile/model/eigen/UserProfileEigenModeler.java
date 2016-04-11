@@ -275,7 +275,7 @@ public class UserProfileEigenModeler extends JavaUserProfileModeler<UserProfileE
             return Arrays.asList(noopModel);
         }
         else {
-            computeCovarianceAndSVD(normalizedInputMatrix, lowVariantColumnCount);
+            computeCovarianceAndSVD(normalizedInputMatrix, lowVariantColumnCount);//计算协方差和奇异值分解
             computeDimensionWithMaxVariance();
             computePrincipalComponents();
             maximumL2Norm = new ArrayRealVector(principalComponents.length);

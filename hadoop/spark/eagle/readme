@@ -107,6 +107,7 @@ kde计算过程
             }
         }
         
+probabilityEstimation[i] *= ((1.00/((Math.sqrt(2.0*Math.PI))*stddev)) * (Math.exp(-( (Math.pow((inputMat.getEntry(i, j) - mean), 2)) / (2.0*(Math.pow(stddev, 2)))))));
 那可以总结下这个用户画像模型：1，作某件事的均值和方差 2，某组事件发生的概率
 
 -------------------------

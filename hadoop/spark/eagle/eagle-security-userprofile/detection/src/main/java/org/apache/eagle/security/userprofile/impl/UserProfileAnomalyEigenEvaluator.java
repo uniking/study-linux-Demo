@@ -132,12 +132,15 @@ public class UserProfileAnomalyEigenEvaluator extends AbstractUserProfileEigenEv
 
         RealMatrix finalInputMatTranspose = finalMatWithoutLowVariantFeatures.transpose();
 
-        for (int i = 0; i < finalMatWithoutLowVariantFeatures.getRowDimension(); i++) {
-            if (lineNoWithVariantBasedAnomalyDetection.get(i) == null) {
+        for (int i = 0; i < finalMatWithoutLowVariantFeatures.getRowDimension(); i++)
+        {
+            if (lineNoWithVariantBasedAnomalyDetection.get(i) == null)
+            {
                 //MLCallbackResult result = new MLCallbackResult();
                 MLCallbackResult result = mlCallbackResults.get(i);
                 //result.setContext(context);
-                for (int sz = 0; sz < pcs.length; sz++) {
+                for (int sz = 0; sz < pcs.length; sz++) 
+                {
                     double[] pc1 = pcs[sz].toArray();
                     RealMatrix pc1Mat = new Array2DRowRealMatrix(pc1);
                     RealMatrix transposePC1Mat = pc1Mat.transpose();
@@ -151,7 +154,8 @@ public class UserProfileAnomalyEigenEvaluator extends AbstractUserProfileEigenEv
                     double distanceiRowAndPC1 = iRowVector.getDistance(pc1Vector);
                     //LOG.info("distance from pc sz: " + sz + " " + distanceiRowAndPC1 + " " + model.getMaxL2Norm().getEntry(sz));
                     //LOG.info("model.getMaxL2Norm().getEntry(sz):" + model.getMaxL2Norm().getEntry(sz));
-                    if (distanceiRowAndPC1 > aModel.maximumL2Norm().getEntry(sz)) {
+                    if (distanceiRowAndPC1 > aModel.maximumL2Norm().getEntry(sz)) 
+                    {
                         //LOG.info("distance from pc sz: " + sz + " " + distanceiRowAndPC1 + " " + model.getMaxL2Norm().getEntry(sz));
                         result.setAnomaly(true);
                         result.setFeature(aModel.statistics()[sz].getCommandName());
