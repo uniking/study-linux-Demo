@@ -18,8 +18,23 @@ object RDDtransform{
     val sc = new SparkContext(conf)
     val line = sc.textFile(args(0))
 
-    line.flatMap(_.split("\t")).map((_, 1)).reduceByKey(_+_).collect.foreach(println)
+	println("--------------line--")
+	line.collect.foreach(println)
+
+    //line.flatMap(_.split("\t")).map((_, 1)).reduceByKey(_+_).collect.foreach(println)
+	val nline = line.flatMap(_.split(" "));
+	println("-----nline-----")
+	nline.collect.foreach(println)
+	
+	val words = nline.map((_,1))
+	println("----------key value--------")
+	words.collect.foreach(println)
     
-    sc.stop
+	val cword = words.reduceByKey(_+_)
+	println("--------word count--------")
+	cword.collect.foreach(println)
+    
+
+	sc.stop
   }
 }

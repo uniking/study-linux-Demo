@@ -1,1 +1,1 @@
- /home/sxis/Eagle/spark-1.3.1-bin-hadoop2.6/bin/spark-submit --name rddtransform --class "com.uniking.spark.base.RDDtransform" --executor-memory 512m --total-executor-cores 1 --master spark://127.0.0.1:7077  rdd-transform-scalar-1.0-SNAPSHOT.jar hdfs://127.0.0.1:8082/tmp/README.md
+ /home/sxis/Eagle/spark-1.3.1-bin-hadoop2.6/bin/spark-submit --name rddtransform --class "com.uniking.spark.base.RDDtransform" --executor-memory 512m --total-executor-cores 1 --master spark://127.0.0.1:7077  rdd-transform-scalar-1.0-SNAPSHOT.jar hdfs://127.0.0.1:8020/tmp/readme
