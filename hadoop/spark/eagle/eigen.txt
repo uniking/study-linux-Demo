@@ -1,3 +1,71 @@
+/home/sxis/workspace/incubator-eagle/eagle-security/eagle-security-userprofile/training/src/main/scala/org/apache/eagle/security/userprofile/job/AuditLogTrainingSparkJob.scala
+由文件到矩阵的转换
+    val tmp = _sc.textFile(input)
+      .map(AuditLogTransformer(_period).transform)
+      .filter(e => e.isDefined)
+      .map(e => {((e.get.user,e.get.periodWindowSeconds,e.get.cmd),1.toDouble) }) // [(user,period,cmd),count]
+
+    val _aggRDD = tmp
+      .reduceByKey(_ + _)                                           // [(user,period,cmd),totalCount]
+      .map(kv => {((kv._1._1, kv._1._2), (kv._1._3, kv._2))})       // [(user,period),(cmd,totalCount)]
+      .groupByKey()
+      .map(asUserCmdCountArray(_cmdTypes))                          // [(user,(period,array))]
+      .sortBy(asUserPeriod, ascending = true)
+      .groupByKey()
+      .map(asMatrix)
+
+/home/sxis/workspace/incubator-eagle/eagle-security/eagle-security-userprofile/common/src/main/scala/org/apache/eagle/security/userprofile/model/AuditlogParser.scala
+从hdfs日志提取信息
+public HDFSAuditLogObject parse(String log) throws Exception{
+		int index0 = log.indexOf(" ");
+		index0 = log.indexOf(" ",index0+1);
+		String data = log.substring(0, index0).trim();
+		int index1 = log.indexOf("allowed="); int len1 = 8;
+		int index2 = log.indexOf("ugi="); int len2 = 4;
+		int index3 = log.indexOf("ip=/"); int len3 = 4;
+		int index4 = log.indexOf("cmd="); int len4 = 4;
+		int index5 = log.indexOf("src="); int len5= 4;
+		int index6 = log.indexOf("dst="); int len6 = 4;
+		int index7 = log.indexOf("perm=");
+
+		String allowed = log.substring(index1 + len1, index2).trim();
+		String ugi = log.substring(index2 + len2, index3).trim();
+		String ip = log.substring(index3 + len3, index4).trim();
+		String cmd = log.substring(index4 + len4, index5).trim();
+		String src = log.substring(index5 + len5, index6).trim();
+		String dst = log.substring(index6 + len6, index7).trim();
+
+		HDFSAuditLogObject entity = new HDFSAuditLogObject();
+		String user = LogParseUtil.parseUserFromUGI(ugi);
+		if (src != null && src.equals("null")) {
+			src = null;
+		}
+
+		if (dst != null && dst.equals("null")) {
+			dst = null;
+		}
+		entity.user = user;
+		entity.cmd = cmd;
+		entity.src = src;
+		entity.dst = dst;
+		entity.host = ip;
+		entity.allowed = Boolean.valueOf(allowed);
+		entity.timestamp = DateTimeUtil.humanDateToMilliseconds(data);
+		return entity;
+	}
+
+public class HDFSAuditLogObject {
+    public long timestamp;
+    public String host;
+    public Boolean allowed;
+    public String user;
+    public String cmd;
+    public String src;
+    public String dst;
+}
+	
+
+
 eigen用户画像算法
 eigen，特征值，这个特征值是用svd分解数据矩阵得到的。
 （可以去看通过svd进行数据降维的协同推荐算法，把用户的一系列动作看作是一件商品，动作的次数视为商品的打分，新来了一条动作（商品），我们推不推荐给该用户？）
