@@ -18,7 +18,8 @@ object WordCount {
     val sc = new SparkContext(conf)
     val line = sc.textFile(args(0))
 
-    line.flatMap(_.split("\t")).map((_, 1)).reduceByKey(_+_).collect.foreach(println)
+    val wcRDD = line.flatMap(_.split("\t")).map((_, 1)).reduceByKey(_+_)
+    wcRDD.repartition(1).saveAsTextFile("hdfs://127.0.0.1:8020/tmp/hello.txt")
     
     sc.stop
   }
