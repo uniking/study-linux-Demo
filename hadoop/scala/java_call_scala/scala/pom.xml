@@ -23,14 +23,8 @@
 
   <build>
 
+        <outputDirectory>../lib/class</outputDirectory>
         <sourceDirectory>src/main/java</sourceDirectory>
-
-<resources>
-<resource>
-<directory>./</directory>
-<targetPath>/home/sxis/study-linux-Demo/hadoop/scala/java_call_scala/Target/</targetPath>
-</resource>
-</resources>
 
     <plugins>
 

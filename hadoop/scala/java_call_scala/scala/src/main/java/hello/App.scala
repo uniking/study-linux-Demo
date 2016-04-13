@@ -6,7 +6,7 @@ package hello
 object App {
   
 
-  def s_main(args : Array[String]) {
+  def s_main() {
     println( "Hello World!" )
   }
 

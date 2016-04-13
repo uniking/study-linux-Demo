@@ -6,6 +6,7 @@
   <version>0.1.0</version>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
+    <outputDirectory>../lib/class</outputDirectory>
     <plugins>
       <plugin>
         <groupId>org.scala-tools</groupId>
