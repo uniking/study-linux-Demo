@@ -1,0 +1,2 @@
+svm-train svmdata.txt model
+svm-predict svmtestdata.txt model ok.txt
