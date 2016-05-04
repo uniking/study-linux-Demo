@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/sxis/study-linux-Demo/stl/toupper/stl.cpp
+iostream
+-
+string
+-
+cctype
+-
+algorithm
+-
+
