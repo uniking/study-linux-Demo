@@ -6,4 +6,4 @@
 --executor-memory 512m \
 --total-executor-cores 1 \
 wordcount-scalar-1.0-SNAPSHOT.jar \
-hdfs://127.0.0.1:8020/readme
+hdfs://127.0.0.1:8020/ip.txt

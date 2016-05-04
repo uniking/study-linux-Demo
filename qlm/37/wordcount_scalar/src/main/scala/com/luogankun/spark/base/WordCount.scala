@@ -19,7 +19,8 @@ object WordCount {
     val line = sc.textFile(args(0))
 
     val wcRDD = line.flatMap(_.split("\t")).map((_, 1)).reduceByKey(_+_)
-    wcRDD.filter(_._2 > 5).map(t=>(t._2, t._1)).sortByKey().saveAsTextFile("hdfs://127.0.0.1:8020/tmp/hello")
+    //wcRDD.filter(_._2 > 5).map(t=>(t._2, t._1)).sortByKey().saveAsTextFile("hdfs://127.0.0.1:8020/tmp/hello")
+    wcRDD.map(t=>(t._2, t._1)).sortByKey().saveAsTextFile("hdfs://127.0.0.1:8020/tmp/hello")
     
     sc.stop
   }

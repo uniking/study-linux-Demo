@@ -32,7 +32,8 @@ int main()
 		state[j] = (1812433253L * (state[j - 1] ^ (state[j - 1] >> 30)) + j);
 		state[j] &= 0xffffffffL;
 	}
-	for(long long  i=0;i<5000000000L;i++)
+	//for(long long  i=0;i<5000000000L;i++)
+	for(long long  i=0;i<20000000L;i++)
 	{
 		printf("%lld\n",next());
 	}
