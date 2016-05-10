@@ -1,3 +1,3 @@
 all:
-	g++ timetest.c -o timetest.exe
+	g++ -std=c++11 timetest.cpp -o timetest.exe
 	
