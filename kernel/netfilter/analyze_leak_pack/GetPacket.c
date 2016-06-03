@@ -9,6 +9,7 @@
 #include <linux/inet.h>
 #include <linux/in.h>
 #include <linux/ip.h>
+#include <linux/tcp.h>
 
 MODULE_LICENSE("GPL");
 #define NIPQUAD(addr) \
@@ -24,6 +25,16 @@ __be16 n2h_16(__be16 integer)
 	((unsigned char *)&rInt)[0] = ((unsigned char *)&integer)[1];
 	((unsigned char *)&rInt)[1] = ((unsigned char *)&integer)[0];
 
+	return rInt;
+}
+
+__be32 n2h_32(__be32 integer)
+{
+	__be32 rInt = 0;
+	((unsigned char *)&rInt)[0] = ((unsigned char *)&integer)[3];
+	((unsigned char *)&rInt)[1] = ((unsigned char *)&integer)[2];
+	((unsigned char *)&rInt)[2] = ((unsigned char *)&integer)[1];
+	((unsigned char *)&rInt)[3] = ((unsigned char *)&integer)[0];
 	return rInt;
 }
 
@@ -71,13 +82,20 @@ static unsigned int sample
 	if(skb)
 	{
 		struct iphdr *iph;
+		struct tcphdr *tcph;
 		struct sk_buff *sb = NULL;
 		sb = skb;
 		iph  = ip_hdr(sb);
 		sip = iph->saddr;
 		dip = iph->daddr;
-		if(cap_two_ip(sip, dip))
-			printk("id:%x s: %d.%d.%d.%d d: %d.%d.%d.%d protocol:%d\n", n2h_16(iph->id), NIPQUAD(sip), NIPQUAD(dip),iph->protocol);
+		//if(cap_two_ip(sip, dip))
+		//	printk("id:%x s: %d.%d.%d.%d d: %d.%d.%d.%d protocol:%d\n", n2h_16(iph->id), NIPQUAD(sip), NIPQUAD(dip),iph->protocol);
+		if(iph->protocol == 6 && cap_ip(dip))
+		{
+			tcph = tcp_hdr(sb);
+			printk("%x ", n2h_32(tcph->seq));
+		}
+		
 	}
 	return NF_ACCEPT;
 }
@@ -92,7 +110,7 @@ struct nf_hook_ops sample_ops = {
 
 static int __init sample_init(void) {
 	g_filter_sip = create_ip(192,168,220,207);
-	g_filter_dip = create_ip(10,0,2,15);
+	g_filter_dip = create_ip(220,181,12,208);
 	nf_register_hook(&sample_ops);
 	return 0;
 }

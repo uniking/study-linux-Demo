@@ -32,7 +32,7 @@ int main()
 	os << inFile.rdbuf();
 	sContent = os.str();
 	bool bT;
-    cout<<sContent<<endl;
+   // cout<<sContent<<endl;
 
 	//RE2 sear("");
 	//int s = clock () ;
@@ -55,7 +55,13 @@ int main()
    //re2::StringPiece input("11111111111111111111111111111");
 	//while(RE2::FindAndConsume(&input, "(\\d{11})", &strTemp))
 	//while(RE2::FindAndConsume(&input, "(\\d{3}\\-\\d{7})", &strTemp))
-    while(RE2::FindAndConsume(&input, "(函数|执行|)", &strTemp))
+   // while(RE2::FindAndConsume(&input, "(函数|执行|)", &strTemp))
+
+    // ([1-9]\d{5}(?!\d))
+
+    cout<<"count:"<<sContent<<endl;
+    //while(RE2::FindAndConsume(&input, "(<\\w+>)", &strTemp))
+    while(RE2::FindAndConsume(&input, "([1-9]\d{5}(?!\d))", &strTemp))
 	{
 		i++;
 		cout<< endl<<strTemp.c_str()<<endl;
@@ -139,13 +145,13 @@ int main()
 	}
 */
 
-/*
+
 	//返回匹配的偏移量
-	std::string test="hello world !";
+	std::string test="<wangzhl@suninfo.com>";
 	re2::StringPiece result;
-	if( RE2::PartialMatch(text, "(world)"), &result) )
+	if( RE2::PartialMatch(test, "(<\\w+>)", &result) )
 		std::cout<<"first at "<< result.data()- test.data() << endl;
-	*/
+	
 
 	return 0;
 }
