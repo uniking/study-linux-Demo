@@ -1,0 +1,1 @@
+cmd_/home/sxis/study-linux-Demo/kernel/netfilter/GetPacket.ko := ld -r -m elf_x86_64 -T /usr/src/kernels/3.10.0-327.10.1.el7.x86_64/scripts/module-common.lds --build-id  -o /home/sxis/study-linux-Demo/kernel/netfilter/GetPacket.ko /home/sxis/study-linux-Demo/kernel/netfilter/GetPacket.o /home/sxis/study-linux-Demo/kernel/netfilter/GetPacket.mod.o
