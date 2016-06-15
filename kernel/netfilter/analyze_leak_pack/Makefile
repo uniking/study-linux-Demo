@@ -1,6 +1,20 @@
-obj-m = GetPacket.o
-KVERSION = $(shell uname -r)
-all:
-	make -C /lib/modules/$(KVERSION)/build M=$(PWD) modules
+# If called directly from the command line, invoke the kernel build system.
+ifeq ($(KERNELRELEASE),)
+
+	KERNEL_SOURCE := /lib/modules/$(shell uname -r)/build
+	PWD := $(shell pwd)
+
+module:
+	$(MAKE) -C $(KERNEL_SOURCE) SUBDIRS=$(PWD) modules
+
 clean:
-	make -C /lib/modules/$(KVERSION)/build M=$(PWD) clean
+	$(MAKE) -C $(KERNEL_SOURCE) SUBDIRS=$(PWD) clean
+
+# Otherwise KERNELRELEASE is defined; we've been invoked from the
+# kernel build system and can use its language.
+else
+
+	obj-m := sxis_get_packet.o
+	sxis_get_packet-y := GetPacket.o Queue.o
+
+endif

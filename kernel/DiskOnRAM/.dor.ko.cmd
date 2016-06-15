@@ -1,1 +1,0 @@
-cmd_/home/sxis/workspace/kernel/DiskOnRAM/dor.ko := ld -r -m elf_x86_64 -T /usr/src/kernels/3.10.0-229.14.1.el7.x86_64/scripts/module-common.lds --build-id  -o /home/sxis/workspace/kernel/DiskOnRAM/dor.ko /home/sxis/workspace/kernel/DiskOnRAM/dor.o /home/sxis/workspace/kernel/DiskOnRAM/dor.mod.o

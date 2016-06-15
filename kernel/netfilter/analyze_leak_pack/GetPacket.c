@@ -11,12 +11,19 @@
 #include <linux/ip.h>
 #include <linux/tcp.h>
 
+#include "Queue.h"
+
 MODULE_LICENSE("GPL");
 #define NIPQUAD(addr) \
 ((unsigned char *)&addr)[0], \
 ((unsigned char *)&addr)[1], \
 ((unsigned char *)&addr)[2], \
 ((unsigned char *)&addr)[3]
+
+#define SOCKET_OPS_BASE 128
+#define SOCKET_OPS_SET (SOCKET_OPS_BASE)
+#define SOCKET_OPS_GET (SOCKET_OPS_BASE)
+#define SOCKET_OPS_MAX (SOCKET_OPS_BASE + 1)
 
 //net to host
 __be16 n2h_16(__be16 integer)
@@ -90,10 +97,21 @@ static unsigned int sample
 		dip = iph->daddr;
 		//if(cap_two_ip(sip, dip))
 		//	printk("id:%x s: %d.%d.%d.%d d: %d.%d.%d.%d protocol:%d\n", n2h_16(iph->id), NIPQUAD(sip), NIPQUAD(dip),iph->protocol);
-		if(iph->protocol == 6 && cap_ip(dip))
+		printk("sample\n");
+		if(iph->protocol == 6)
 		{
+			TCP_DATA tcp_data = {0};
+			//__asm__("int3");
 			tcph = tcp_hdr(sb);
-			printk("%x ", n2h_32(tcph->seq));
+			//printk("%x ", n2h_32(tcph->seq));
+			tcp_data.sip = sip;
+			tcp_data.dip = dip;
+			tcp_data.s_port = n2h_16(tcph->source);
+			tcp_data.d_port = n2h_16(tcph->dest);
+			tcp_data.seq = tcp_data.seq + n2h_16(iph->tot_len)*4 - ;
+			tcp_data.want_seq = n2h_32(tcph->ack_seq);
+			if(put_data(&tcp_data) == QUEUE_FULL)
+				printk("tcp queue full\n");
 		}
 		
 	}
@@ -108,16 +126,88 @@ struct nf_hook_ops sample_ops = {
 	.priority = NF_IP_PRI_FILTER+2 //优先级
 };
 
+/////////////////////////////////////////////////////
+static int recv_msg(struct sock* sk, int cmd, void __user* user, unsigned int len)
+{
+	int ret_len;
+	printk("recv_msg\n");
+	TCP_DATA tcp_data = {0};
+	if(cmd == SOCKET_OPS_SET && len == sizeof(TCP_DATA))
+	{
+		ret_len = copy_from_user(&tcp_data, user, len);
+	}
+
+	return 0;
+}
+
+static int send_msg(struct sock* sk, int cmd, void __user* user, int* len)
+{
+	int ret = 0;
+	int ret_len;
+	TCP_DATA tcp_data = {0};
+	printk("send_msg\n");
+	if(cmd == SOCKET_OPS_SET && *len >= sizeof(TCP_DATA))
+	{
+		if(QUEUE_EMPTY == get_data(&tcp_data))
+		{
+			printk("tcp queue empty\n");
+			ret = -1;
+		}
+		else
+		{
+			ret_len = copy_to_user(user, &tcp_data, *len);
+		}
+	}
+	else
+	{
+		printk("parameter error\n");
+	}
+
+	return ret;
+}
+static struct nf_sockopt_ops test_sockops =
+{
+	.pf = PF_INET,
+	.set_optmin = SOCKET_OPS_SET,
+	.set_optmax = SOCKET_OPS_MAX,
+	.set = recv_msg,
+	.get_optmin = SOCKET_OPS_GET,
+	.get_optmax = SOCKET_OPS_MAX,
+	.get = send_msg,
+	.owner = THIS_MODULE,
+};
+
+
+
 static int __init sample_init(void) {
+	int ret;
+	
+	printk("init tcp queue\n");
+	init_tcp_queue_sx(100000);
+
+	printk("register sockopt\n");
+	ret = nf_register_sockopt(&test_sockops);
+	if(ret)
+		printk("nf_register_sockopt error\n");
+
 	g_filter_sip = create_ip(192,168,220,207);
 	g_filter_dip = create_ip(220,181,12,208);
-	nf_register_hook(&sample_ops);
+
+	printk("register hook\n");
+	ret = nf_register_hook(&sample_ops);
+	if(ret)
+		printk("nf_register_hook error\n");
 	return 0;
 }
 
 
 static void __exit sample_exit(void) {
+	printk("unregister hook\n");
 	nf_unregister_hook(&sample_ops);
+	printk("unregister sockopt\n");
+	nf_unregister_sockopt(&test_sockops);
+	printk("uninit tcp queue\n");
+	uninit_tcp_queue_sx();
 }
 
 module_init(sample_init);
