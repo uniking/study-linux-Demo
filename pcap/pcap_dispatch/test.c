@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <net/ethernet.h>
 #include <time.h>
+#include <errno.h>
 
 #define DEV_1 "p3p1"
 /*
@@ -83,8 +84,8 @@ int main(int argc,char **argv)
 	/* set the compiled program as the filter */
 	if(pcap_setfilter(descr,&fp) == -1)
 	{
-		fprintf(stderr,"Error setting filter\n");
-		exit(1);
+		fprintf(stderr,"Error setting filter %m\n");
+		exit(errno);
 	}
 
 	/* … and loop */

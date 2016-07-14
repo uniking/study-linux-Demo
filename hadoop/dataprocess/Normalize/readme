@@ -1,0 +1,1 @@
+normalize -weight weight_file -in attr_file

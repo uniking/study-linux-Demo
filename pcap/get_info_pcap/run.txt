@@ -1,0 +1,1 @@
+./test "tcp[tcpflags] & (tcp-syn|tcp-fin) != 0 and not src and dst net loopback"

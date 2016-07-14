@@ -61,11 +61,11 @@ int main()
 
     cout<<"count:"<<sContent<<endl;
     //while(RE2::FindAndConsume(&input, "(<\\w+>)", &strTemp))
-    while(RE2::FindAndConsume(&input, "([1-9]\d{5}(?!\d))", &strTemp))
-	{
-		i++;
-		cout<< endl<<strTemp.c_str()<<endl;
-	}
+    //while(RE2::FindAndConsume(&input, "([1-9]\d{5}(?!\d))", &strTemp))
+	//{
+	//	i++;
+	//	cout<< endl<<strTemp.c_str()<<endl;
+	//}
 
 
 /*
@@ -147,10 +147,13 @@ int main()
 
 
 	//返回匹配的偏移量
-	std::string test="<wangzhl@suninfo.com>";
+	std::string test="<wangzhl@suninfo.com>中文";
 	re2::StringPiece result;
-	if( RE2::PartialMatch(test, "(<\\w+>)", &result) )
-		std::cout<<"first at "<< result.data()- test.data() << endl;
+	//if( RE2::PartialMatch(test, "(<\\w+>)", &result) )
+	//	std::cout<<"first at "<< result.data()- test.data() << endl;
+
+	if( RE2::PartialMatch(test, "([\u4e00-\u9fa5])", &result) )
+		std::cout<<"first at "<< result.data()- test.data() << result<<endl;
 	
 
 	return 0;

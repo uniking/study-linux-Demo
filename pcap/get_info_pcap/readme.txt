@@ -1,0 +1,3 @@
+-i netport
+-f filterconfig
+-o logpath

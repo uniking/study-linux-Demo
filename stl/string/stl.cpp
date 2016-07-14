@@ -40,7 +40,7 @@ int main()
     if(utf_1 == utf_2)
         cout<<utf_1<<"=="<<utf_2<<endl;
 
-    string find_s="/root/abc/ef.txt";
+    string find_s="/root/abc/中国ef.txt";
     int fn = find_s.find_last_of('/');
     string sub_n = find_s.substr(fn+1);
     cout<<fn<<" "<<sub_n<<endl;

@@ -1,3 +1,6 @@
 瀚思 密度估计代码
 
 https://github.com/hansight/algorithms
+
+OutSkewer只用于一维数据 array[12,13,14,19]
+ParallelOptics用于多维数据 array[array[12,23,34,45], array[56,67,78,79]]
