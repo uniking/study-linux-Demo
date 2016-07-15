@@ -16,5 +16,7 @@
 			elem => String
 			elem.split(" ") => Array[String]
 			elem.split(" ").toDouble => Array[String].toDouble, there is't toDouble in Array
+
+			map(function(element))
 		*/
 	}

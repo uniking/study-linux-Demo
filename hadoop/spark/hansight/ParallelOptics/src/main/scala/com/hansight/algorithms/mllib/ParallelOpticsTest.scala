@@ -104,36 +104,41 @@ private def test(sc:SparkContext, data:Array[Array[Double]], minPts: Int, radius
 }
 
 
-  def getCluster[T]( optResult  : Array[_<:ParallelOptics#Point],
-                     data       : Array[T],
-                     r          : Double ) : (Int, Int, ListBuffer[ListBuffer[P[T]]]) = {
-    var flag  = 0
-    var noise = 0
-    val lb    = ListBuffer[ListBuffer[P[T]]]()
-    val lbn   = ListBuffer[P[T]]()
-    val lb_   = ListBuffer[P[T]]()
-    for ( i <- optResult ) {
-      if (i.reachDis > r) {
-        if (i.coreDis > r) {
-          noise += 1
-          lbn   += new P(-1, data(i.id.toInt))
-        }
-        else {
-          flag += 1
-          if (lb_.length > 0)
-            lb += lb_.clone()
-          lb_ --= lb_
-          lb_  += new P(flag, data(i.id.toInt))
-        }
-      }
-      else
-        lb_  += new P(flag, data(i.id.toInt))
-    }
-    if (lb_.length > 0)
-      lb += lb_.clone()
-    if (lbn.length > 0)
-      lb += lbn
-    (flag, noise, lb)
-  }
+	def getCluster[T]( optResult  : Array[_<:ParallelOptics#Point],
+							data       : Array[T],
+							r          : Double ) : (Int, Int, ListBuffer[ListBuffer[P[T]]]) = 
+	{
+		var flag  = 0
+		var noise = 0
+		val lb    = ListBuffer[ListBuffer[P[T]]]()
+		val lbn   = ListBuffer[P[T]]()
+		val lb_   = ListBuffer[P[T]]()
+		for ( i <- optResult ) 
+		{
+			if (i.reachDis > r) 
+			{
+				if (i.coreDis > r) 
+				{
+					noise += 1
+					lbn   += new P(-1, data(i.id.toInt))
+				}
+				else 
+				{
+					flag += 1
+					if (lb_.length > 0)
+						lb += lb_.clone()
+					lb_ --= lb_
+					lb_  += new P(flag, data(i.id.toInt))
+				}
+			}
+			else
+				lb_  += new P(flag, data(i.id.toInt))
+		}
+		if (lb_.length > 0)
+			lb += lb_.clone()
+		if (lbn.length > 0)
+			lb += lbn
+		(flag, noise, lb)
+	}
 
 }
