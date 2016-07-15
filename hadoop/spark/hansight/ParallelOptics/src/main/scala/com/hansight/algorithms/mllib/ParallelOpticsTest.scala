@@ -19,19 +19,23 @@ import scala.collection.mutable.ArrayBuffer
  */
 object ParallelOpticsTest {
 
-  class P[T](flag_ : Int, data_ : T) {
-    val flag     = flag_
-    val data     = data_
-  }
+	class P[T](flag_ : Int, data_ : T) {
+		val flag     = flag_
+		val data     = data_
+	}
 
-  def main(args: Array[String]): Unit = {
-    if (args.length < 2) {
-      println("usage: DenseGmmEM <input file> <r>")
-    } else {
-      val maxIterations = if (args.length > 3) args(3).toInt else 100
-      run(args(0), args(1).toInt, args(2).toDouble)
-    }
-  }
+	def main(args: Array[String]): Unit =
+	{
+		if (args.length < 2)
+		{
+			println("usage: DenseGmmEM <input file> <r>")
+		}
+		else
+		{
+			val maxIterations = if (args.length > 3) args(3).toInt else 100
+			run(args(0), args(1).toInt, args(2).toDouble)
+		}
+	}
 
 
 
@@ -46,7 +50,7 @@ object ParallelOpticsTest {
 		val data = ctx.textFile(inputFile)
 		val line = data.collect
 
-		val mat:ArrayBuffer[Array[Double]] = new ArrayBuffer(10)
+		val mat:ArrayBuffer[Array[Double]] = new ArrayBuffer()
 		for(elem <- line)
 			mat += elem.split(" ").map(_.toDouble)
 		test(ctx, mat.toArray, minPts, radius)
@@ -54,54 +58,54 @@ object ParallelOpticsTest {
 
 
 
-private def test(sc:SparkContext, data:Array[Array[Double]], minPts: Int, radius:Double)
-{
-
-	for(elem <- data)
-		elem.foreach(println _)
-
-
-	val data_ = sc.parallelize(data)
-
-	// noise must be 0, cluster must be 1
-	// lb = [[cluster_1]]
-	//var opt = new ParallelOptics(1, Double.MaxValue, "EuclideanDistance")
-	var opt = new ParallelOptics(minPts, radius, "EuclideanDistance")
-	var out = opt.run(data_).collect()
-	for (elem <- out)
+	private def test(sc:SparkContext, data:Array[Array[Double]], minPts: Int, radius:Double)
 	{
-		println("id:"+elem.id + " cd:"+elem.coreDis + " rd:"+elem.reachDis + " notCore:"+elem.notCore)
+
+		for(elem <- data)
+			elem.foreach(println _)
+
+
+		val data_ = sc.parallelize(data)
+
+		// noise must be 0, cluster must be 1
+		// lb = [[cluster_1]]
+		//var opt = new ParallelOptics(1, Double.MaxValue, "EuclideanDistance")
+		var opt = new ParallelOptics(minPts, radius, "EuclideanDistance")
+		var out = opt.run(data_).collect()
+		for (elem <- out)
+		{
+			println("id:"+elem.id + " cd:"+elem.coreDis + " rd:"+elem.reachDis + " notCore:"+elem.notCore)
+		}
+
+		var clu = getCluster(out, data, 0)
+		//assert(clu._1           == 1)
+		//assert(clu._2           == 0)
+		//assert(clu._3.length    == 1)
+		//assert(clu._3(0).length == 3)
+		//assert(clu._3(0).forall(x => x.flag == 1))
+
+		// noise must be 3, cluster must be 0
+		// lb = [[noise]]
+		//opt = new ParallelOptics(1, -2, "EuclideanDistance")
+		//out = opt.run(data_).collect()
+		//out.foreach(println (_.id, _.reachDis, _.coreDis) )
+
+		//clu = getCluster(out, data, 0)
+		//assert(clu._1           == 0)
+		//assert(clu._2           == 3)
+		//assert(clu._3.length    == 1)
+		//assert(clu._3(0).length == 3)
+		//assert(clu._3(0).forall(x => x.flag == -1))
+		//opt = new ParallelOptics(Int.MaxValue, Double.MaxValue, "EuclideanDistance")
+		//out = opt.run(data_).collect()
+		//clu = getCluster(out, data, 99999.0)
+		//assert(clu._1           == 0)
+		//assert(clu._2           == 3)
+		//assert(clu._3.length    == 1)
+		//assert(clu._3(0).length == 3)
+		//assert(clu._3(0).forall(x => x.flag == -1))
+
 	}
-
-	var clu = getCluster(out, data, 0)
-	//assert(clu._1           == 1)
-	//assert(clu._2           == 0)
-	//assert(clu._3.length    == 1)
-	//assert(clu._3(0).length == 3)
-	//assert(clu._3(0).forall(x => x.flag == 1))
-
-	// noise must be 3, cluster must be 0
-	// lb = [[noise]]
-	//opt = new ParallelOptics(1, -2, "EuclideanDistance")
-	//out = opt.run(data_).collect()
-	//out.foreach(println (_.id, _.reachDis, _.coreDis) )
-
-	//clu = getCluster(out, data, 0)
-	//assert(clu._1           == 0)
-	//assert(clu._2           == 3)
-	//assert(clu._3.length    == 1)
-	//assert(clu._3(0).length == 3)
-	//assert(clu._3(0).forall(x => x.flag == -1))
-	//opt = new ParallelOptics(Int.MaxValue, Double.MaxValue, "EuclideanDistance")
-	//out = opt.run(data_).collect()
-	//clu = getCluster(out, data, 99999.0)
-	//assert(clu._1           == 0)
-	//assert(clu._2           == 3)
-	//assert(clu._3.length    == 1)
-	//assert(clu._3(0).length == 3)
-	//assert(clu._3(0).forall(x => x.flag == -1))
-
-}
 
 
 	def getCluster[T]( optResult  : Array[_<:ParallelOptics#Point],

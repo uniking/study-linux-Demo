@@ -8,6 +8,12 @@ println("a:"+a)
 var b=fun(x=>x)
 println("b:"+b)
 
+var c=fun(3 * _)
+println("c:"+c)
+
+var d=fun( M[_] )
+println("d:"+d)		//???????????????
+
 
 val vF=fun _ //函数作为值存储
 a=vF(x=>x*4)
