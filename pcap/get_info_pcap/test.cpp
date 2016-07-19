@@ -9,6 +9,11 @@
 #include <time.h>
 #include <errno.h>
 #include "net.h"
+#include <cstring>
+
+#include <string>
+#include <iostream>
+using namespace std;
 
 #define DEV_1 "p3p1"
 /*
@@ -20,8 +25,9 @@ void printer()
 	return;
 }
 
-void analyze_tcp(struct tcp_header* tcph)
+bool analyze_tcp(struct tcp_header* tcph, string& log)
 {
+	return false;
 }
 
 
@@ -46,21 +52,24 @@ bool filter_innet_addr(in_addr_t n_ip_addr)
 	return false;
 }
 
-void analyze_ip(struct ip_header* iph)
+bool analyze_ip(struct ip_header* iph, string& log)
 {
 	u_char* pIpAddr;
+	char buf[128]={0};
 
 	if(filter_innet_addr(iph->ip_souce_address.s_addr) && filter_innet_addr(iph->ip_destination_address.s_addr))
-		return;
+		return false;
 
 	unsigned int sss = iph->ip_souce_address.s_addr;
 	pIpAddr = (u_char*)&sss;
-	printf("s:%d.%d.%d.%d ", pIpAddr[0], pIpAddr[1], pIpAddr[2], pIpAddr[3]);
+	sprintf(buf, "s:%d.%d.%d.%d ", pIpAddr[0], pIpAddr[1], pIpAddr[2], pIpAddr[3]);
+	log+=buf;
 
+	memset(buf, 0, 128);
 	sss = iph->ip_destination_address.s_addr;
 	pIpAddr = (u_char*)&sss;
-	printf("d:%d.%d.%d.%d ", pIpAddr[0], pIpAddr[1], pIpAddr[2], pIpAddr[3]);
-
+	sprintf(buf, "d:%d.%d.%d.%d ", pIpAddr[0], pIpAddr[1], pIpAddr[2], pIpAddr[3]);
+	log+=buf;
 
 	switch(iph->ip_protocol)
 	{
@@ -69,7 +78,7 @@ void analyze_ip(struct ip_header* iph)
 		case 2://igmp
 			break;
 		case 6://tcp
-			analyze_tcp((struct tcp_header*) ((u_char*)iph) + iph->ip_header_length*4);
+			analyze_tcp((struct tcp_header*) ((u_char*)iph) + iph->ip_header_length*4, log);
 			break;
 		case 17://udp
 			break;
@@ -78,6 +87,8 @@ void analyze_ip(struct ip_header* iph)
 	}
 
 	printf("\n");
+
+	return true;
 }
 
 /* 
@@ -87,13 +98,18 @@ void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char* 
 {
 	struct ether_header *eptr;  /* net/ethernet.h */
 	int eth_type;
+	bool b_log = false;
+	string msg;
+	char buf[128] = {0};
 
+	sprintf(buf, "t:%d ", pkthdr->ts);
+	msg += buf;
 	eptr = (struct ether_header *) packet;
 	eth_type = ntohs(eptr->ether_type);
 	switch(eth_type)
 	{
 		case 0x0800://ip
-			analyze_ip( (struct ip_header*)(packet+14) );
+			b_log = analyze_ip( (struct ip_header*)(packet+14) , msg);
 			break;
 		case 0x0806://arp
 			break;
@@ -103,6 +119,9 @@ void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char* 
 			;
 	}
 
+	if(b_log)
+		cout<<msg<<endl;
+	
 }
 
 /*
