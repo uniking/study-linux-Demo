@@ -24,6 +24,7 @@ import scala.collection.JavaConversions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * @since  7/31/15
@@ -38,26 +39,41 @@ case class UserActivityAggModel(user:String,matrix:RealMatrix,cmdTypes:Seq[Strin
 
 public class UserActivityAggModel
 {
-
-	private List<String> cmdTypes;
+	private String m_user;
+	private RealMatrix m_matrix;
+	private String[] m_cmdTypes;
+	private String m_site;
+	private Long m_timestamp;
 
 	public UserActivityAggModel(String user,RealMatrix matrix,String[] cmdTypes,String site,Long timestamp)
 	  //extends EntityConversion[UserActivityAggModelEntity]
 	{
 	  //override def toEntity: UserActivityAggModelEntity = UserActivityAggModelEntity.fromModel(this)
 	  //override def fromEntity(entity: UserActivityAggModelEntity): Unit = UserActivityAggModelEntity.toModel(entity)
+
+		m_user = user;
+		m_matrix = matrix;
+		m_cmdTypes = cmdTypes;
+		m_site = site;
+		m_timestamp = timestamp;
 	}
 
 	public RealMatrix matrix()
 	{
-		double[][] coefficientsData = { { 3, 1 }, { 1, 2 } };
-
-		RealMatrix coefficients = new Array2DRowRealMatrix(coefficientsData);
-		return coefficients;
+		return m_matrix;
 	}
 
+	//public String[] getCmdTypes() {
+	//	return m_cmdTypes;
+	//}
+
 	public List<String> getCmdTypes() {
-		return cmdTypes;
+		List<String> cmd = new ArrayList<String>();
+		for(String x:m_cmdTypes)
+		{
+			cmd.add(x);
+		}
+		return cmd;
 	}
 
 
@@ -70,7 +86,6 @@ public class UserActivityAggModel
 
 	public long timestamp()
 	{
-		long timestamp = 0;
-		return timestamp;
+		return m_timestamp;
 	}
 }

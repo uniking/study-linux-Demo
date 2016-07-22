@@ -30,24 +30,75 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.io.Serializable;
 
-public class UserProfileEigenModel
+public class UserProfileEigenModel implements Serializable
 {
-	public UserProfileEigenModel (
-   Long version,
-	String site,
-	String user,
-	RealMatrix uMatrix,
-	RealMatrix diagonalMatrix,
+	private UserCommandStatistics[] listStats;
+	private double maxPro;
+	private RealVector[] ppc;
 
-	int dimension,
-	RealVector minVector,
-	RealVector maxVector,
-	RealVector[] principalComponents,
-	RealVector maximumL2Norm,
-	RealVector minimumL2Norm,
-   UserCommandStatistics[] statistics
+
+   private Long m_version;
+	private String m_site;
+	private String m_user;
+	private RealMatrix m_uMatrix;
+	private RealMatrix m_diagonalMatrix;
+	private int m_dimension;
+	private RealVector m_minVector;
+	private RealVector m_maxVector;
+	private RealVector[] m_principalComponents;
+	private RealVector m_maximumL2Norm;
+	private RealVector m_minimumL2Norm;
+   private UserCommandStatistics[] m_statistics;
+
+
+	public UserProfileEigenModel (
+	   Long version,
+		String site,
+		String user,
+		RealMatrix uMatrix,
+		RealMatrix diagonalMatrix,
+		int dimension,
+		RealVector minVector,
+		RealVector maxVector,
+		RealVector[] principalComponents,
+		RealVector maximumL2Norm,
+		RealVector minimumL2Norm,
+	   UserCommandStatistics[] statistics
 	)
 	{
+	   m_version = version;
+		m_site = site;
+		m_user = user;
+		m_uMatrix = uMatrix;
+		m_diagonalMatrix = diagonalMatrix;
+		m_dimension = dimension;
+		m_minVector = minVector;
+		m_maxVector = maxVector;
+		m_principalComponents = principalComponents;
+		m_maximumL2Norm = maximumL2Norm;
+		m_minimumL2Norm = minimumL2Norm;
+	   m_statistics = statistics;
+	}
+
+	 public UserCommandStatistics[] statistics()
+	{
+		return m_statistics;
+	}
+
+	public double maxProbabilityEstimate()
+	{
+		return maxPro;
+	}
+
+	public RealVector[] principalComponents()
+	{
+		return ppc;
+	}
+
+	public RealVector maximumL2Norm()
+	{
+		return m_maximumL2Norm;
 	}
 }

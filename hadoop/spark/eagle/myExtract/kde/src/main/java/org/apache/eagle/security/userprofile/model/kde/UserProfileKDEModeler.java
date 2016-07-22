@@ -54,38 +54,50 @@ public class UserProfileKDEModeler// extends JavaUserProfileModeler<UserProfileK
 
     public UserProfileKDEModeler(){
         //this.cmdTypes = UserProfileConstants.DEFAULT_CMD_TYPES;
-		this.cmdTypes = new String[]{"cmd", "ls","pwd"};
+		this.cmdTypes = new String[]{"cmd", "ls","pwd", "ldd"};
     }
 
-    private void computeStats(RealMatrix m){
-        if(m.getColumnDimension() !=  this.cmdTypes.length){
-            LOG.error("Please fix the commands list in config file");
-        }
+    private void computeStats(RealMatrix m)
+	{
+		if(m.getColumnDimension() !=  this.cmdTypes.length)
+		{
+			LOG.error("Please fix the commands list in config file");
+		}
 
-        statistics = new UserCommandStatistics[m.getColumnDimension()];
+		System.out.println("computeStatus 1");
+		statistics = new UserCommandStatistics[m.getColumnDimension()];
 
-        for(int i=0; i<m.getColumnDimension(); i++){
-            UserCommandStatistics stats = new UserCommandStatistics();
-            stats.setCommandName(this.cmdTypes[i]);
-            RealVector colData = m.getColumnVector(i);
-            StandardDeviation deviation = new StandardDeviation();
-            double stddev = deviation.evaluate(colData.toArray()); //计算 标准差
+		System.out.println("computeStatus 2");
+		for(int i=0; i<m.getColumnDimension(); i++)
+		{
+			UserCommandStatistics stats = new UserCommandStatistics();
+			stats.setCommandName(this.cmdTypes[i]);
+			RealVector colData = m.getColumnVector(i);
+			StandardDeviation deviation = new StandardDeviation();
+			System.out.println("computeStatus 4");
+			double stddev = deviation.evaluate(colData.toArray()); //计算 标准差
 
-            if(LOG.isDebugEnabled()) LOG.debug("Stddev is NAN ? " + (Double.isNaN(stddev) ? "yes" : "no"));
-            if(stddev <= lowVarianceVal)
-                stats.setLowVariant(true);
-            else
-                stats.setLowVariant(false);
+			if(LOG.isDebugEnabled())
+				LOG.debug("Stddev is NAN ? " + (Double.isNaN(stddev) ? "yes" : "no"));
+			if(stddev <= lowVarianceVal)
+				stats.setLowVariant(true);
+			else
+				stats.setLowVariant(false);
 
-            stats.setStddev(stddev);
-            Mean mean = new Mean(); //计算 均值
-            double mu = mean.evaluate(colData.toArray());
-            if(LOG.isDebugEnabled()) LOG.debug("mu is NAN ? " + (Double.isNaN(mu)? "yes":"no"));
+			System.out.println("computeStatus 5");
+			stats.setStddev(stddev);
+			Mean mean = new Mean(); //计算 均值
+			double mu = mean.evaluate(colData.toArray());
+			System.out.println("computeStatus 6");
+			if(LOG.isDebugEnabled())
+				LOG.debug("mu is NAN ? " + (Double.isNaN(mu)? "yes":"no"));
 
-            stats.setMean(mu);
-            statistics[i]=stats;
-        }
-    }
+			stats.setMean(mu);
+			statistics[i]=stats;
+		}
+
+		System.out.println("computeStatus 3");
+	}
 
     private void computeProbabilityDensityEstimation(RealMatrix inputMat){
 
@@ -137,8 +149,11 @@ public class UserProfileKDEModeler// extends JavaUserProfileModeler<UserProfileK
     public List<UserProfileKDEModel> generate(String site, String user, RealMatrix matrix)
 	{
         LOG.info(String.format("Receive aggregated user activity matrix: %s size: %s x %s",user,matrix.getRowDimension(),matrix.getColumnDimension()));
+			System.out.println("computeStatus");
         computeStats(matrix);
+			System.out.println("computeProbabilityDensityEstimation");
         computeProbabilityDensityEstimation(matrix);
+
         UserProfileKDEModel userprofileKDEModel = new UserProfileKDEModel(System.currentTimeMillis(),site,user, statistics, minProbabilityEstimate, maxProbabilityEstimate, nintyFivePercentileEstimate, medianProbabilityEstimate);
         return Arrays.asList(userprofileKDEModel);
     }

@@ -61,6 +61,7 @@ public class UserProfileAnomalyKDEEvaluator //extends AbstractUserProfileKDEEval
 
         if(aModel == null){
             LOG.info("No model available for this uer, returning");
+				System.out.println("No model available for this uer, returning");	
             return null;
         }
 
@@ -77,6 +78,7 @@ public class UserProfileAnomalyKDEEvaluator //extends AbstractUserProfileKDEEval
 
             if(inputData.getColumnDimension() != cmds.size()){
                 LOG.error("Test data is not with same dimension as training, aborting...");
+					System.out.println("Test data is not with same dimension as training, aborting..." + inputData.getColumnDimension() + cmds.size());	
                 return null;
             }else{
 
@@ -145,6 +147,8 @@ public class UserProfileAnomalyKDEEvaluator //extends AbstractUserProfileKDEEval
             callBackResult.setAlgorithm(UserProfileConstants.KDE_ALGORITHM);
             mlPredictionOutputList.add(callBackResult);
         }
-        return mlPredictionOutputList;
+
+		System.out.println("return mlPredictionOutputList");		
+		return mlPredictionOutputList;
     }
 }

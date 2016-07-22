@@ -65,7 +65,7 @@ public class UserProfileEigenModeler //extends JavaUserProfileModeler<UserProfil
 
     public UserProfileEigenModeler(){
         //this.cmdTypes = UserProfileConstants.DEFAULT_CMD_TYPES;
-			this.cmdTypes = new String[]{"cd", "ls", "pwd"};
+			this.cmdTypes = new String[]{"cd", "ls", "pwd", "ldd"};
     }
 
     public RealVector getMaximumL2Norm() {

@@ -25,7 +25,7 @@ thr_fn(void* arg)
 	pid = getpid();
 	tid = pthread_self();
 	printf("new thread %s pid=%u tid=%u \n", (char*)arg, (unsigned int)pid, (unsigned int)tid);
-	for(i=0; i<100; i++)
+	for(i=0; i<3000; i++)
 	{
 		sleep(1);
 		printf("%d\n", i);
@@ -43,7 +43,11 @@ main()
 	tid = pthread_self();
 	
 	err = pthread_create(&ntid, NULL, thr_fn, NULL);
-	err = pthread_setname_np(ntid, "my_thread");
+	char name[16];
+	snprintf(name, 16, "aa1");
+	name[15]=0;
+	err = pthread_setname_np(ntid, name);
+	//err = pthread_setname_np(ntid, "my_thread");
 	if(0 != err)
 		printf("set name error %d %d\n", err, errno);
 	printf("pid=%u tid=%u sonthread=%u\n", (unsigned int)pid, (unsigned int)tid, (unsigned int) ntid);

@@ -30,19 +30,56 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.io.Serializable;
 
-public class UserProfileKDEModel
+import scala.collection.JavaConversions;
+
+public class UserProfileKDEModel implements Serializable
 {
+	private RealVector[] ppc;
+	
+	private Long m_version;
+	private String m_site;
+	private String m_user;
+   private UserCommandStatistics[] m_listStats;
+   private Double m_minProbabilityEstimate;
+   private Double m_maxProbabilityEstimate;
+   private Double m_nintyFivePercentileEstimate;
+   private Double m_medianProbabilityEstimate;
+
 	public UserProfileKDEModel (
-   Long version,
-	String site,
-	String user,
-   UserCommandStatistics[] statistics,
-   Double minProbabilityEstimate,
-   Double maxProbabilityEstimate,
-   Double nintyFivePercentileEstimate,
-   Double medianProbabilityEstimate
+	   Long version,
+		String site,
+		String user,
+	   UserCommandStatistics[] statistics,
+	   Double minProbabilityEstimate,
+	   Double maxProbabilityEstimate,
+	   Double nintyFivePercentileEstimate,
+	   Double medianProbabilityEstimate
 	)
 	{
+		m_version = version;
+		m_site = site;
+		m_user = user;
+		m_listStats = statistics;
+		m_minProbabilityEstimate = minProbabilityEstimate;
+		m_maxProbabilityEstimate = maxProbabilityEstimate;
+		m_nintyFivePercentileEstimate = nintyFivePercentileEstimate;
+		m_medianProbabilityEstimate = medianProbabilityEstimate;
+	}
+
+	 public UserCommandStatistics[] statistics()
+	{
+		return m_listStats;
+	}
+
+	public double maxProbabilityEstimate()
+	{
+		return m_maxProbabilityEstimate;
+	}
+
+	public RealVector[] principalComponents()
+	{
+		return ppc;
 	}
 }

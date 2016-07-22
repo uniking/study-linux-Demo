@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.wzl.spark.base</groupId>
-  <artifactId>eagle.kde</artifactId>
+  <artifactId>eagle.test</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>kde</name>
+  <name>test</name>
 
 
   <repositories>
@@ -30,10 +30,16 @@
 			<version>1.7</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
   </dependencies>
 
   <build>
-	<sourceDirectory>src/main/scala</sourceDirectory>
+	<sourceDirectory>src/main/java</sourceDirectory>
 	<outputDirectory>../lib/class</outputDirectory>
 
     <plugins>
@@ -65,21 +71,40 @@
 		</configuration>
 		</plugin>
 
-
 		<plugin>
-			<artifactId>maven-dependency-plugin</artifactId>
-			<executions>
-				<execution>
-				    <phase>package</phase>
-				    <goals>
-				        <goal>copy-dependencies</goal>
-				    </goals>
-				    <configuration>
-				        <outputDirectory>${project.build.directory}/lib</outputDirectory>
-				    </configuration>
-				</execution>
-			</executions>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<configuration>
+			<archive>
+			<manifest>
+			<addClasspath>true</addClasspath>
+			<mainClass>org.wzl.test</mainClass>
+			</manifest>
+			</archive>
+			</configuration>
 		</plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>hello.HelloWorld</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
     </plugins>
 
@@ -87,18 +112,4 @@
 
   </build>
 
-  <profiles>
-    <profile>
-      <id>scala-2.10</id>
-      <activation>
-        <property><name>!scala-2.11</name></property>
-      </activation>
-      <properties>
-        <scala.version>2.10</scala.version>
-        <scala.binary.version>2.10.4</scala.binary.version>
-        <jline.version>${scala.version}</jline.version>
-        <jline.groupid>org.scala-lang</jline.groupid>
-      </properties>
-    </profile>
-  </profiles>
 </project>
