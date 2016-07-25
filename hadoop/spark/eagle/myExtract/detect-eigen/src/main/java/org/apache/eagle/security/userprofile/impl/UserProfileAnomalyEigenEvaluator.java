@@ -63,6 +63,7 @@ public class UserProfileAnomalyEigenEvaluator //extends AbstractUserProfileEigen
             return null;
         }
 
+			System.out.println("ed0");
         List<MLCallbackResult> mlCallbackResults = new ArrayList<MLCallbackResult>();
         RealMatrix normalizedMat = normalizeData(inputData, aModel);
 
@@ -75,11 +76,13 @@ public class UserProfileAnomalyEigenEvaluator //extends AbstractUserProfileEigen
             }
         }
 
+		System.out.println("ed1");
         final Map<String,String> context = new HashMap<String, String>(){{
             put(UserProfileConstants.USER_TAG,user);
             put(UserProfileConstants.ALGORITHM_TAG,algorithm);
         }};
 
+		System.out.println("ed2");
         Map<Integer, String> lineNoWithVariantBasedAnomalyDetection = new HashMap<Integer, String>();
         for (int i = 0; i < normalizedMat.getRowDimension(); i++) {
             MLCallbackResult aResult = new MLCallbackResult();
@@ -111,12 +114,13 @@ public class UserProfileAnomalyEigenEvaluator //extends AbstractUserProfileEigen
                     }*/
                 }
             }
+				System.out.println("mlCallbackResults.add " + i);
             mlCallbackResults.add(i, aResult);
             //return results;
         }
 
         //LOG.info("results size here: " + results.length);
-
+			System.out.println("ed3");
         //LOG.info("col with high variant: " + colWithHighVariant);
         RealMatrix finalMatWithoutLowVariantFeatures = new Array2DRowRealMatrix(normalizedMat.getRowDimension(), colWithHighVariant);
         //LOG.info("size of final test data: " + finalMatWithoutLowVariantFeatures.getRowDimension() +"x"+ finalMatWithoutLowVariantFeatures.getColumnDimension());
@@ -134,45 +138,55 @@ public class UserProfileAnomalyEigenEvaluator //extends AbstractUserProfileEigen
         }
         RealVector[] pcs = aModel.principalComponents();
         //LOG.info("pc size: " + pcs.getRowDimension() +"x" + pcs.getColumnDimension());
-
+			System.out.println("ed4");
         RealMatrix finalInputMatTranspose = finalMatWithoutLowVariantFeatures.transpose();
 
-        for (int i = 0; i < finalMatWithoutLowVariantFeatures.getRowDimension(); i++) {
-            if (lineNoWithVariantBasedAnomalyDetection.get(i) == null) {
-                //MLCallbackResult result = new MLCallbackResult();
-                MLCallbackResult result = mlCallbackResults.get(i);
-                //result.setContext(context);
-                for (int sz = 0; sz < pcs.length; sz++) {
-                    double[] pc1 = pcs[sz].toArray();
-                    RealMatrix pc1Mat = new Array2DRowRealMatrix(pc1);
-                    RealMatrix transposePC1Mat = pc1Mat.transpose();
-                    RealMatrix testData = pc1Mat.multiply(transposePC1Mat).multiply(finalInputMatTranspose.getColumnMatrix(i));
-                    //LOG.info("testData size: " + testData.getRowDimension() + "x" + testData.getColumnDimension());
-                    RealMatrix testDataTranspose = testData.transpose();
-                    //LOG.info("testData transpose size: " + testDataTranspose.getRowDimension() + "x" + testDataTranspose.getColumnDimension());
-                    RealVector iRowVector = testDataTranspose.getRowVector(0);
-                    //RealVector pc1Vector = transposePC1Mat.getRowVector(sz);
-                    RealVector pc1Vector = transposePC1Mat.getRowVector(0);
-                    double distanceiRowAndPC1 = iRowVector.getDistance(pc1Vector);
-                    //LOG.info("distance from pc sz: " + sz + " " + distanceiRowAndPC1 + " " + model.getMaxL2Norm().getEntry(sz));
-                    //LOG.info("model.getMaxL2Norm().getEntry(sz):" + model.getMaxL2Norm().getEntry(sz));
-                    if (distanceiRowAndPC1 > aModel.maximumL2Norm().getEntry(sz)) {
-                        //LOG.info("distance from pc sz: " + sz + " " + distanceiRowAndPC1 + " " + model.getMaxL2Norm().getEntry(sz));
-                        result.setAnomaly(true);
-                        result.setFeature(aModel.statistics()[sz].getCommandName());
-                        result.setTimestamp(System.currentTimeMillis());
-                        result.setAlgorithm(UserProfileConstants.EIGEN_DECOMPOSITION_ALGORITHM);
-                        List<String> datapoints = new ArrayList<String>();
-                        double[] rowVals = inputData.getRow(i);
-                        for(double rowVal:rowVals)
-                            datapoints.add(rowVal+"");
-                        result.setDatapoints(datapoints);
-                        result.setId(user);
-                    }
-                }
-                mlCallbackResults.set(i, result);
-            }
-        }
-        return mlCallbackResults;
+		for (int i = 0; i < finalMatWithoutLowVariantFeatures.getRowDimension(); i++)
+		{
+			System.out.println("ed4.1");
+			if (lineNoWithVariantBasedAnomalyDetection.get(i) == null)
+			{
+				System.out.println("ed4.2");
+				//MLCallbackResult result = new MLCallbackResult();
+				MLCallbackResult result = mlCallbackResults.get(i);
+				System.out.println("ed4.3 "+i);
+				//result.setContext(context);
+				for (int sz = 0; sz < pcs.length; sz++)
+				{
+					System.out.println("ed4.4");
+					double[] pc1 = pcs[sz].toArray();
+					RealMatrix pc1Mat = new Array2DRowRealMatrix(pc1);
+					RealMatrix transposePC1Mat = pc1Mat.transpose();
+					RealMatrix testData = pc1Mat.multiply(transposePC1Mat).multiply(finalInputMatTranspose.getColumnMatrix(i));
+					//LOG.info("testData size: " + testData.getRowDimension() + "x" + testData.getColumnDimension());
+					RealMatrix testDataTranspose = testData.transpose();
+					//LOG.info("testData transpose size: " + testDataTranspose.getRowDimension() + "x" + testDataTranspose.getColumnDimension());
+					RealVector iRowVector = testDataTranspose.getRowVector(0);
+					//RealVector pc1Vector = transposePC1Mat.getRowVector(sz);
+					RealVector pc1Vector = transposePC1Mat.getRowVector(0);
+					double distanceiRowAndPC1 = iRowVector.getDistance(pc1Vector);
+					//LOG.info("distance from pc sz: " + sz + " " + distanceiRowAndPC1 + " " + model.getMaxL2Norm().getEntry(sz));
+					//LOG.info("model.getMaxL2Norm().getEntry(sz):" + model.getMaxL2Norm().getEntry(sz));
+					if (distanceiRowAndPC1 > aModel.maximumL2Norm().getEntry(sz))
+					{
+						System.out.println("ed4.5");
+						//LOG.info("distance from pc sz: " + sz + " " + distanceiRowAndPC1 + " " + model.getMaxL2Norm().getEntry(sz));
+						result.setAnomaly(true);
+						result.setFeature(aModel.statistics()[sz].getCommandName());
+						result.setTimestamp(System.currentTimeMillis());
+						result.setAlgorithm(UserProfileConstants.EIGEN_DECOMPOSITION_ALGORITHM);
+						List<String> datapoints = new ArrayList<String>();
+						double[] rowVals = inputData.getRow(i);
+						for(double rowVal:rowVals)
+							datapoints.add(rowVal+"");
+						result.setDatapoints(datapoints);
+						result.setId(user);
+					}
+				}
+				mlCallbackResults.set(i, result);
+			}
+		}
+		System.out.println("ed5");
+		return mlCallbackResults;
     }
 }

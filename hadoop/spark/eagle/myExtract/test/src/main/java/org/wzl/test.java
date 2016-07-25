@@ -111,9 +111,10 @@ public class test {
 
 	public static boolean detect_kde(UserProfileKDEModel model)
 	{
+		System.out.println("detect_kde");
 		UserProfileAnomalyKDEEvaluator discover = new UserProfileAnomalyKDEEvaluator();
 
-		double[][] userData = { {32,15,36,59}, {1,2,3,4} , {8,6,3,0}, {2,2,3,4}, {1,2,3,4}, {1,2,1,4}, {1,2,3,4}, {1,2,2,4}, {1,2,3,1}, {1,1,3,4}};
+		double[][] userData = { {32,15,36,59}, {1,2,3,4} , {8,6,3,0}, {2,2,3,4}, {3,1,2,3}};
 		RealMatrix matrix = new Array2DRowRealMatrix(userData);
 		String[] cmdTypes = new String[]{"cmd", "ls", "hhh", "jjj"};
 		Long timestamp = 478545L;
@@ -140,16 +141,34 @@ public class test {
 
 	public static boolean detect_eigen(UserProfileEigenModel model)
 	{
+		System.out.println("detect_eigen");
+
 		UserProfileAnomalyEigenEvaluator discover = new UserProfileAnomalyEigenEvaluator();
 
-		double[][] userData = { {3,1,3,5}, {1,2,3,4} , {1,4,3,4}, {2,2,3,4}, {1,2,3,4}, {1,2,1,4}, {1,2,3,4}, {1,2,2,4}, {1,2,3,1}, {1,1,3,4}};
+		System.out.println("d0");
+		double[][] userData = {{32,15,36,59}, {1,2,3,4} , {8,6,3,0}, {2,2,3,4}, {3,1,2,3}};
 		RealMatrix matrix = new Array2DRowRealMatrix(userData);
-		String[] cmdTypes = new String[]{"cmd", "ls"};
+		String[] cmdTypes = new String[]{"cmd", "ls","hhh","jjj"};
 		Long timestamp = 478545L;
 		
+		System.out.println("d1");
 		UserActivityAggModel uAct = new UserActivityAggModel("user1", matrix, cmdTypes, "hadoop-s", timestamp);
 
-		discover.detect("user1", UserProfileConstants.EIGEN_DECOMPOSITION_ALGORITHM, uAct, model);
+		System.out.println("d2");
+		List<MLCallbackResult> res = discover.detect("user1", UserProfileConstants.USER_PROFILE_EIGEN_MODEL_SERVICE, uAct, model);
+
+		System.out.println("d3");
+		if(res != null)
+		{
+			System.out.println("show result:");
+			for(MLCallbackResult x: res)
+			{
+				boolean isA = x.isAnomaly();
+				System.out.println("is anomaly:"+ isA);
+			}
+		}
+		else
+			System.out.println("res null");
 
 		return true;
 	}
@@ -163,7 +182,7 @@ public class test {
 
 			UserProfileKDEModeler kde = new UserProfileKDEModeler();
 
-			double[][] userData = { {3,1,3,5}, {1,2,3,4} , {1,4,3,4}, {2,2,3,4}, {1,2,3,4}, {1,2,1,4}, {1,2,3,4}, {1,2,2,4}, {1,2,3,1}, {1,1,3,4}};
+			double[][] userData = { {3,1,3,5}, {3,1,3,5} , {3,1,3,5}, {3,1,3,5}, {3,1,3,5}, {3,1,3,5}, {3,1,2,3}, {3,1,2,3}, {3,1,2,3}, {3,1,2,3}};
 
 			RealMatrix matrix = new Array2DRowRealMatrix(userData);
 
@@ -181,7 +200,7 @@ public class test {
 
 			mymodel = "./eModel";
 			UserProfileEigenModeler eigen = new UserProfileEigenModeler();
-			List<UserProfileEigenModel> eigen_model = eigen.generate("hbase-s", "user2", matrix);
+			List<UserProfileEigenModel> eigen_model = eigen.generate("hadoop-s", "user1", matrix);
 			for(UserProfileEigenModel y :eigen_model)
 			{
 				System.out.println("to save model");
@@ -194,6 +213,12 @@ public class test {
 			for(UserProfileKDEModel x:lModle)
 			{
 				detect_kde(x);
+			}
+
+			//detect eigen
+			for(UserProfileEigenModel y:eigen_model)
+			{
+				detect_eigen(y);
 			}
 		}
 		catch(Exception e)

@@ -156,43 +156,54 @@ public class UserProfileEigenModeler //extends JavaUserProfileModeler<UserProfil
         return normalizedData;
     }
 
-    private void computeCovarianceAndSVD(RealMatrix inputMat, int containsLowVariantCol){
+	private void computeCovarianceAndSVD(RealMatrix inputMat, int containsLowVariantCol)
+	{				
+		int finalMatrixRow=0;
+		int finalMatrixCol=0;
 
-        int finalMatrixRow=0;
-        int finalMatrixCol=0;
+		LOG.info("containsLowVariantCol size: " + containsLowVariantCol);
+		int colDimension = (inputMat.getColumnDimension() - containsLowVariantCol);
+		try
+		{
+			finalMatrixWithoutLowVariantCmds = new Array2DRowRealMatrix(inputMat.getRowDimension(), colDimension);
+		}
+		catch (NotStrictlyPositiveException e)
+		{
+			System.out.println("Failed to build matrix [rowDimension:%s, columnDimension: %s]" + inputMat.getRowDimension() + colDimension);
+			LOG.error(String.format("Failed to build matrix [rowDimension:%s, columnDimension: %s]",inputMat.getRowDimension(),colDimension),e);
+			throw e;
+		}
 
-        LOG.info("containsLowVariantCol size: " + containsLowVariantCol);
-        int colDimension = (inputMat.getColumnDimension() - containsLowVariantCol);
-        try {
-            finalMatrixWithoutLowVariantCmds = new Array2DRowRealMatrix(inputMat.getRowDimension(), colDimension);
-        }catch (NotStrictlyPositiveException e){
-            LOG.error(String.format("Failed to build matrix [rowDimension:%s, columnDimension: %s]",inputMat.getRowDimension(),colDimension),e);
-            throw e;
-        }
+		for(int i=0; i < inputMat.getRowDimension(); i++)
+		{
+			for(int j=0; j < inputMat.getColumnDimension();j++)
+			{
+				if(!statistics[j].isLowVariant())
+				{
+					finalMatrixWithoutLowVariantCmds.setEntry(finalMatrixRow, finalMatrixCol, inputMat.getEntry(i, j));
+					finalMatrixCol++;
+				}
+			}
+			finalMatrixCol = 0;
+			finalMatrixRow++;
+		}
 
-        for(int i=0; i < inputMat.getRowDimension(); i++){
-            for(int j=0; j < inputMat.getColumnDimension();j++){
-                if(!statistics[j].isLowVariant()){
-                    finalMatrixWithoutLowVariantCmds.setEntry(finalMatrixRow, finalMatrixCol, inputMat.getEntry(i, j));
-                    finalMatrixCol++;
-                }
-            }
-            finalMatrixCol = 0;
-            finalMatrixRow++;
-        }
-
-        Covariance cov;
-        try {
-            cov = new Covariance(finalMatrixWithoutLowVariantCmds.getData());
-        }catch (Exception ex){
-            throw new IllegalArgumentException(String.format("Failed to create covariance from matrix [ %s x %s ]",finalMatrixWithoutLowVariantCmds.getRowDimension(),finalMatrixWithoutLowVariantCmds.getColumnDimension()),ex);
-        }
-        covarianceMatrix = cov.getCovarianceMatrix();
-        SingularValueDecomposition svd = new SingularValueDecomposition(covarianceMatrix);
-        diagonalMatrix = svd.getS();
-        uMatrix = svd.getU();
-        vMatrix = svd.getV();
-    }
+		Covariance cov;
+		try
+		{
+			cov = new Covariance(finalMatrixWithoutLowVariantCmds.getData());
+		}
+		catch (Exception ex)
+		{
+			System.out.println("Failed to create covariance from matrix  " + finalMatrixWithoutLowVariantCmds.getRowDimension() + " " + finalMatrixWithoutLowVariantCmds.getColumnDimension());
+			throw new IllegalArgumentException(String.format("Failed to create covariance from matrix [ %s x %s ]",finalMatrixWithoutLowVariantCmds.getRowDimension				(),finalMatrixWithoutLowVariantCmds.getColumnDimension()),ex);
+		}
+		covarianceMatrix = cov.getCovarianceMatrix();
+		SingularValueDecomposition svd = new SingularValueDecomposition(covarianceMatrix);
+		diagonalMatrix = svd.getS();
+		uMatrix = svd.getU();
+		vMatrix = svd.getV();
+	}
 
     private void computeDimensionWithMaxVariance(){
         if(diagonalMatrix == null || diagonalMatrix.getRowDimension() != diagonalMatrix.getColumnDimension()){
@@ -262,8 +273,11 @@ public class UserProfileEigenModeler //extends JavaUserProfileModeler<UserProfil
     //@Override
     public List<UserProfileEigenModel> generate(String site, String user, RealMatrix matrix) {
         LOG.info(String.format("Receive aggregated user activity matrix: %s size: %s x %s",user,matrix.getRowDimension(),matrix.getColumnDimension()));
+			System.out.println("Receive aggregated user activity matrix:" + user + matrix.getRowDimension() + matrix.getColumnDimension() );
         computeStats(matrix);
+			System.out.println("c1");
         RealMatrix normalizedInputMatrix = normalizeData(matrix);
+			System.out.println("c2");
         int lowVariantColumnCount = 0;
         for(int j=0; j < normalizedInputMatrix.getColumnDimension();j++){
             if(statistics[j].isLowVariant()){
@@ -271,22 +285,34 @@ public class UserProfileEigenModeler //extends JavaUserProfileModeler<UserProfil
             }
         }
 
-        if(normalizedInputMatrix.getColumnDimension() == lowVariantColumnCount){
+			System.out.println("c3");
+        if(normalizedInputMatrix.getColumnDimension() == lowVariantColumnCount)
+		{
+			System.out.println("c5");
             LOG.info("found user: " + user + " with all features being low variant. Nothing to do...");
+				System.out.println("found user: " + user + " with all features being low variant. Nothing to do...");
             UserProfileEigenModel noopModel = new UserProfileEigenModel(System.currentTimeMillis(),site,user,null,null,0,null,null,null,null,null,statistics);
             return Arrays.asList(noopModel);
         }
-        else {
+        else 
+		{
+			System.out.println("c6");
             computeCovarianceAndSVD(normalizedInputMatrix, lowVariantColumnCount);//计算协方差和奇异值分解
+			System.out.println("c6.1");
             computeDimensionWithMaxVariance();
+				System.out.println("c6.2");
             computePrincipalComponents();
+				System.out.println("c6.3");
             maximumL2Norm = new ArrayRealVector(principalComponents.length);
             minimumL2Norm = new ArrayRealVector(principalComponents.length);
 
-            for (int i = 0; i < principalComponents.length; i++) {
+				System.out.println("c7");
+            for (int i = 0; i < principalComponents.length; i++)
+				{
                 RealMatrix trainingDataTranspose = computeMaxDistanceOnPCs(i);
-            }
+            	}
 
+				System.out.println("c4");
             UserProfileEigenModel userprofileEigenModel = new UserProfileEigenModel(System.currentTimeMillis(),site,user, uMatrix, diagonalMatrix, dimension, minVector, maxVector, principalComponents, maximumL2Norm, minimumL2Norm, statistics);
             return Arrays.asList(userprofileEigenModel);
         }

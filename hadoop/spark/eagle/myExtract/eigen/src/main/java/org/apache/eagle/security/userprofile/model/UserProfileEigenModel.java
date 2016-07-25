@@ -87,14 +87,14 @@ public class UserProfileEigenModel implements Serializable
 		return m_statistics;
 	}
 
-	public double maxProbabilityEstimate()
+	public RealVector maxProbabilityEstimate()
 	{
-		return maxPro;
+		return m_maxVector;
 	}
 
 	public RealVector[] principalComponents()
 	{
-		return ppc;
+		return m_principalComponents;
 	}
 
 	public RealVector maximumL2Norm()
