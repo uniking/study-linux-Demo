@@ -80,4 +80,9 @@ public class UserCommandStatistics implements Serializable {
         map.put(IS_LOW_VARIANT,this.isLowVariant);
         return map;
     }
+
+	public void print()
+	{
+		System.out.println("commandName:"+commandName + " mean:"+ mean + " stddev:"+stddev + " isLowVariant:"+isLowVariant);
+	}
 }

@@ -67,6 +67,8 @@ public class HDFSAuditLogObject {
 
 
 eigen用户画像算法
+（基于与现有数据的距离，设个现有数据是所有数据的压缩版本，现有数据间有一个最大距离和最小距离，在之间的应该是异常的）
+
 eigen，特征值，这个特征值是用svd分解数据矩阵得到的。
 （可以去看通过svd进行数据降维的协同推荐算法，把用户的一系列动作看作是一件商品，动作的次数视为商品的打分，新来了一条动作（商品），我们推不推荐给该用户？）
 
@@ -95,9 +97,27 @@ svd从 Data矩阵=V矩阵*对角矩阵*U矩阵
 3，计算主要组件（缩写为pc）
 U矩阵*对角矩阵=组件
 
-4，计算组件件的距离
-的出最大值maximumL2Norm，最小值minimumL2Norm
-的出距离最大的两个向量minVector，maxVector
+4，计算组件间的距离
+得出最大值maximumL2Norm，最小值minimumL2Norm
+得出距离最大的两个向量minVector，maxVector
+
+        for(int i = 0; i < trainingDataTranspose.getRowDimension(); i++){
+            RealVector iRowVector = new ArrayRealVector(trainingDataTranspose.getRow(i));
+            RealVector transposePC1Vect = transposePC1.getRowVector(0);
+            double distance = iRowVector.getDistance(transposePC1Vect);
+            if(distance > maxDistance){
+                maxDistance = distance;
+                p1 = iRowVector;
+                p2 = transposePC1Vect;
+            }
+            if(distance < minDistance)
+                minDistance = distance;
+            //}
+        }
+        maximumL2Norm.setEntry(index, maxDistance);
+        minimumL2Norm.setEntry(index, minDistance);
+		
+		
 
 5，模型文件（java序列化文件）
 site,

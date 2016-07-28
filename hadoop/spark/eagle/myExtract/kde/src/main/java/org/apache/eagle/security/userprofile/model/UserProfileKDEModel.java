@@ -82,4 +82,15 @@ public class UserProfileKDEModel implements Serializable
 	{
 		return ppc;
 	}
+
+	public void print()
+	{
+		System.out.println("KDEModel: version=" + m_version + " site:" + m_site + " user:" + 
+									m_user + " minProbabilityEstimate:"+m_minProbabilityEstimate +" maxProbabilityEstimate:"+m_maxProbabilityEstimate 
+					+ " nintyFivePercentileEstimate:"+m_nintyFivePercentileEstimate + " medianProbabilityEstimate:"+m_medianProbabilityEstimate);
+		for(UserCommandStatistics x:m_listStats)
+		{
+			x.print();
+		}
+	}
 }

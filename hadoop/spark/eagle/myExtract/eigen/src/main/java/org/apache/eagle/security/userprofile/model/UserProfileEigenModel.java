@@ -34,11 +34,6 @@ import java.io.Serializable;
 
 public class UserProfileEigenModel implements Serializable
 {
-	private UserCommandStatistics[] listStats;
-	private double maxPro;
-	private RealVector[] ppc;
-
-
    private Long m_version;
 	private String m_site;
 	private String m_user;
@@ -100,5 +95,52 @@ public class UserProfileEigenModel implements Serializable
 	public RealVector maximumL2Norm()
 	{
 		return m_maximumL2Norm;
+	}
+
+
+	public void print_RealVector(RealVector v)
+	{
+		double[] tmp = v.toArray();
+		for(double x:tmp)
+			System.out.print(" "+x);
+		System.out.println(" ");
+	}
+
+	public void print_RealMatrix(RealMatrix rm)
+	{
+		double[][] m = rm.getData();
+		for(double[] x:m)
+		{
+			for(double y:x)
+				System.out.print(" " + y);
+			System.out.println(" ");
+		}
+	}
+
+	public void print()
+	{
+		System.out.println("EigenModel:" + " version:" + m_version + " site:" + m_site + " user:" + m_user + " dimension:" + m_dimension);
+
+		System.out.println("UserCommandStatistics");
+		for(UserCommandStatistics x:m_statistics)
+			x.print();
+
+		System.out.println("m_minVector");
+		print_RealVector(m_minVector);
+		System.out.println("m_maxVector");
+		print_RealVector(m_maxVector);
+		System.out.println("m_maximumL2Norm");
+		print_RealVector(m_maximumL2Norm);
+		System.out.println("m_minimumL2Norm");
+		print_RealVector(m_minimumL2Norm);
+
+		System.out.println("m_principalComponents");
+		for(RealVector y: m_principalComponents)
+			print_RealVector(y);
+
+		System.out.println("m_uMatrix");
+		print_RealMatrix(m_uMatrix);
+		System.out.println("m_diagonalMatrix");
+		print_RealMatrix(m_diagonalMatrix);
 	}
 }

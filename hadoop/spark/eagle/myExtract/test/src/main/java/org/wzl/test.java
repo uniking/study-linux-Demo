@@ -18,10 +18,14 @@ import org.apache.eagle.security.userprofile.impl.UserProfileAnomalyEigenEvaluat
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix; 
 
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -114,7 +118,9 @@ public class test {
 		System.out.println("detect_kde");
 		UserProfileAnomalyKDEEvaluator discover = new UserProfileAnomalyKDEEvaluator();
 
-		double[][] userData = { {32,15,36,59}, {1,2,3,4} , {8,6,3,0}, {2,2,3,4}, {3,1,2,3}};
+		//double[][] userData = { {32,15,36,59}, {1,2,3,4} , {8,6,3,0}, {2,2,3,4}, {3,1,2,3}};
+		double[][] userData = File2Matrix("testip.txt");
+
 		RealMatrix matrix = new Array2DRowRealMatrix(userData);
 		String[] cmdTypes = new String[]{"cmd", "ls", "hhh", "jjj"};
 		Long timestamp = 478545L;
@@ -146,7 +152,9 @@ public class test {
 		UserProfileAnomalyEigenEvaluator discover = new UserProfileAnomalyEigenEvaluator();
 
 		System.out.println("d0");
-		double[][] userData = {{32,15,36,59}, {1,2,3,4} , {8,6,3,0}, {2,2,3,4}, {3,1,2,3}};
+		//double[][] userData = {{32,15,36,59}, {1,2,3,4} , {8,6,3,0}, {2,2,3,4}, {3,1,2,3}};
+		double[][] userData = File2Matrix("testip.txt");
+
 		RealMatrix matrix = new Array2DRowRealMatrix(userData);
 		String[] cmdTypes = new String[]{"cmd", "ls","hhh","jjj"};
 		Long timestamp = 478545L;
@@ -173,7 +181,65 @@ public class test {
 		return true;
 	}
 
-	public static void main(String[] args)  throws Exception
+	public static double[][] File2Matrix(String file_path)
+	{
+		double[][] m;
+		ArrayList< ArrayList< Double > > lm = new ArrayList<ArrayList<Double>>();
+		File file = new File(file_path);
+		int row = 0;
+		int rol = 0;
+		BufferedReader reader = null;
+		try
+		{
+			System.out.println("以行为单位读取文件内容，一次读一整行：");
+			reader = new BufferedReader(new FileReader(file));
+			String tempString = null;
+			int line = 1;
+			// 一次读入一行，直到读入null为文件结束
+			while ((tempString = reader.readLine()) != null)
+			{
+				ArrayList<Double> ld = new ArrayList<Double>();
+				String a[]=tempString.split(",");
+				for(String x:a)
+				{
+					ld.add(Double.parseDouble(x));
+				}
+				lm.add(ld);
+				rol = ld.size();
+				line++;
+			}
+			reader.close();
+
+			//array to []
+			row = lm.size();
+			System.out.println("row:"+row+" rol:"+rol);
+			m = new double[row][rol];
+			int i=0;
+			int j=0;
+			for(ArrayList<Double> w:lm)
+			{
+				for(Double o:w)
+				{
+					m[i][j]=o;
+					j++;
+				}
+				i++;
+				j=0;
+			}
+
+			return m;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+		finally
+		{
+		}
+	}
+
+	public static void test()  throws Exception
 	{
 
 		try
@@ -182,7 +248,8 @@ public class test {
 
 			UserProfileKDEModeler kde = new UserProfileKDEModeler();
 
-			double[][] userData = { {3,1,3,5}, {3,1,3,5} , {3,1,3,5}, {3,1,3,5}, {3,1,3,5}, {3,1,3,5}, {3,1,2,3}, {3,1,2,3}, {3,1,2,3}, {3,1,2,3}};
+			//double[][] userData = { {3,1,3,5}, {3,1,3,5} , {3,1,3,5}, {3,1,3,5}, {3,1,3,5}, {3,1,3,5}, {3,1,2,3}, {3,1,2,3}, {3,1,2,3}, {3,1,2,3}};
+			double[][] userData = File2Matrix("ip.txt");
 
 			RealMatrix matrix = new Array2DRowRealMatrix(userData);
 
@@ -212,12 +279,14 @@ public class test {
 			//detect
 			for(UserProfileKDEModel x:lModle)
 			{
+				x.print();
 				detect_kde(x);
 			}
 
 			//detect eigen
 			for(UserProfileEigenModel y:eigen_model)
 			{
+				y.print();
 				detect_eigen(y);
 			}
 		}
@@ -228,6 +297,13 @@ public class test {
 		
 		System.out.println("exit");
 
+	}
+
+	public static void main(String[] args)  throws Exception
+	{
+		//double[][] mx = File2Matrix("ip.txt");
+		test();
+		System.out.println("ok");
 	}
 
 }
