@@ -8,8 +8,12 @@
 #include <net/ethernet.h>
 #include <time.h>
 #include <errno.h>
+#include <mysql.h>
 #include "net.h"
 #include <cstring>
+
+#include <re2/re2.h>
+#include <re2/stringpiece.h>
 
 #include <string>
 #include <iostream>
@@ -18,6 +22,9 @@ using namespace std;
 string g_outFile;
 
 #define DEV_1 "p3p1"
+
+bool insert_log_mysql(const char* sip, const char* dip, const char* hostname);
+
 /*
 the printer running when packet have captured
 */
@@ -41,7 +48,7 @@ void get_ndis_hostname(char* in, char* out)
 	while(ln != 0 && indexOut < 512)
 	{
 		int count=0;
-		while(count < ln)
+		while(count < ln && indexOut < 512)
 		{
 			out[indexOut++] = in[indexIn++];
 			count++;
@@ -51,23 +58,26 @@ void get_ndis_hostname(char* in, char* out)
 			out[indexOut++] = '.';
 	}
 
-	out[indexOut] = 0;
+	if(indexOut < 512)
+		out[indexOut] = 0;
+	else
+		sprintf(out, "error");
 }
 
 bool analyze_dns(PDNS_HEADER dnsh, u_int16_t length, string& log)
 {
 	bool bRtn = false;
-	char hostname[512]={0};
+	char hostname[1024]={0};
 	u_int16_t dType = *(u_int16_t*)((char*)dnsh+length-4);
 	u_int16_t dClass = *(u_int16_t*)((char*)dnsh+length-2);
 
-	//if(dnsh->qr == 0 &&
-	//	dnsh->opcode == 0 &&
-	//	dnsh->tc == 0 &&
-	//	dnsh->rd == 1 )
-	//{
-	//	if(ntohs(dnsh->q_count) == 1)
-	//	{
+	if(dnsh->qr == 0 &&
+		dnsh->opcode == 0 &&
+		dnsh->tc == 0 &&
+		dnsh->rd == 1 )
+	{
+		if(ntohs(dnsh->q_count) == 1)
+		{
 			//if(ntohs(dType) == 1 && ntohs(dClass) == 1)
 			//{
 				get_ndis_hostname((char*)dnsh+12, hostname);
@@ -75,12 +85,12 @@ bool analyze_dns(PDNS_HEADER dnsh, u_int16_t length, string& log)
 				log += hostname;
 				bRtn = true;
 			//}
-	//	}
-	//	else
-	//	{
-	//		cout<<"dnsh->q_count != 1"<<endl;
-	//	}
-	//}
+		}
+		else
+		{
+			cout<<"dnsh->q_count != 1"<<endl;
+		}
+	}
 	
 	return bRtn;
 }
@@ -171,8 +181,8 @@ void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char* 
 	string msg;
 	char buf[128] = {0};
 
-	sprintf(buf, "t:%d ", pkthdr->ts);
-	msg += buf;
+	//sprintf(buf, "t:%d ", pkthdr->ts);
+	//msg += buf;
 	eptr = (struct ether_header *) packet;
 	eth_type = ntohs(eptr->ether_type);
 	switch(eth_type)
@@ -189,8 +199,73 @@ void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char* 
 	}
 
 	if(b_log)
+	{
 		cout<<msg<<endl;
+		string sip;
+		string dip;
+		string hostname;
+
+		RE2::PartialMatch(msg, "(sip:\\d+.\\d+.\\d+.\\d+)", &sip);
+		RE2::PartialMatch(sip, "(\\d+.\\d+.\\d+.\\d+)", &sip);
+
+		RE2::PartialMatch(msg, "(dip:\\d+.\\d+.\\d+.\\d+)", &dip);
+		RE2::PartialMatch(dip, "(\\d+.\\d+.\\d+.\\d+)", &dip);
+
+		RE2::PartialMatch(msg, "(hostname:.+)", &hostname);
+		RE2::PartialMatch(hostname, "([^hostname:].+)", &hostname);
+
+		if(sip.size()>32 ||
+			dip.size()>32 ||
+			hostname.size()>255)
+			;
+		else
+			insert_log_mysql(sip.c_str(), dip.c_str(), hostname.c_str());
+	}
 	
+}
+
+MYSQL mysql;
+
+int init_mysql()
+{
+	MYSQL_RES *res;
+
+	mysql_init(&mysql);
+	
+	if(!mysql_real_connect(&mysql, "localhost", "root", "abcd", "DNSdata", 0, NULL, 0) )
+	{
+		printf("mysql_real_connect error\n");
+		return 1;
+	}
+	
+	return 0;
+}
+
+void un_init_mysql()
+{
+	mysql_close(&mysql);
+}
+
+bool insert_log_mysql(const char* sip, const char* dip, const char* hostname)
+{
+	int t=0;
+
+	char query[1024] = {0};
+	if( snprintf(query, 1024, "insert into dns(time, sip, dip, hostname) value(now(), \'%s\', \'%s\', \'%s\')", sip, dip, hostname) > 0)
+	{
+		t = mysql_real_query(&mysql, query, (unsigned int)strlen(query));
+		if(t)
+		{
+			printf("mysql_real_query error\n");
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
 }
 
 /*
@@ -214,6 +289,12 @@ int main(int argc,char **argv)
 	{
 		cout<<argv[0]<<" -f p3p2 -o filename [-p \"tcp[tcpflags] & (tcp-syn|tcp-fin) != 0 and not src and dst net loopback\"]"<<endl;
 		return 0;
+	}
+
+	if(init_mysql())
+	{
+		cout<<"init mysql error"<<endl;
+		return 1;
 	}
 
 	int pi = 1;
@@ -249,7 +330,8 @@ int main(int argc,char **argv)
 	/* open device for reading this time lets set it in promiscuous
 	* mode so we can monitor traffic to another machine             */
 	//descr = pcap_open_live(dev,BUFSIZ,1,-1,errbuf);
-	descr = pcap_open_live(face.c_str(),BUFSIZ,1,-1,errbuf);
+	//descr = pcap_open_live(face.c_str(),BUFSIZ,1,-1,errbuf);  // -1 cpu 100%
+	descr = pcap_open_live(face.c_str(),BUFSIZ,1,1000,errbuf);
 	if(descr == NULL)
 	{
 		printf("pcap_open_live(): %s\n",errbuf);
@@ -273,5 +355,6 @@ int main(int argc,char **argv)
 	/* … and loop */
 	pcap_loop(descr,-1,my_callback,NULL);
 
+	un_init_mysql();
 	return 0;
 }

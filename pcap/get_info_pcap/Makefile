@@ -1,2 +1,2 @@
 all:
-	g++ test.cpp -o test -lpcap
+	g++ -g test.cpp -o test -lpcap

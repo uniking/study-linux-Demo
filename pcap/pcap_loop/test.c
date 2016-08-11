@@ -52,7 +52,7 @@ int main(int argc,char **argv)
 	if(dev == NULL)
 	{
 		printf("%s\n",errbuf);
-		exit(1);./
+		exit(1);
 	}
 	/* open device for reading */
 	//descr = pcap_open_live(dev,BUFSIZ,0,-1,errbuf);

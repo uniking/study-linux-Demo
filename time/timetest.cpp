@@ -10,7 +10,7 @@ using namespace std;
 
 void print_tm(struct tm* t)
 {
-    printf("%d %d %d %d %d %d\n",t->tm_yday, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+    printf("%04d-%02d-%02d %02d:%02d:%02d\n",t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
 }
 
 void cpp_test()
