@@ -6,6 +6,8 @@
 #include <sstream>
 #include <ctime>
 
+#include <sys/time.h>
+
 using namespace std;
 
 void print_tm(struct tm* t)
@@ -24,6 +26,19 @@ void cpp_test()
     } else {
         std::cout << std::put_time(&t, "%c") << '\n';
     }
+}
+
+void calc_time_dif()
+{
+	struct timeval t_start, t_end;
+
+	gettimeofday(&t_start, NULL);
+
+	// run you program
+
+	gettimeofday(&t_end, NULL);
+
+	cout<<t_end.tv_sec - t_start.tv_sec<<"s "<<t_end.tv_usec-t_start.tv_usec<<"us"<<endl;
 }
 
 int main(int argn, char* argv[])

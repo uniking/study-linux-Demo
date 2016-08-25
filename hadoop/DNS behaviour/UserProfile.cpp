@@ -1,18 +1,19 @@
 #include "UserProfile.hpp"
 
-void CUserProfile::anomie(list<DATA_ITEM>& data, multimap<string, bool>& result)
+void CUserProfile::anomie(list<DATA_ITEM>& data, list<CResult>& result)
 {
 	list<DATA_ITEM>::iterator item = data.begin();
 	while(item != data.end())
 	{
 		map<string, CDNSModel>::iterator f = model_list.find((*item).user);
+		CResult rslt;
 		if(f != model_list.end())
 		{
-			bool re = (*f).second.anomie(*item);
-			result.insert(make_pair((*item).user, re));
+			rslt = (*f).second.anomie(*item);
+			result.push_back(rslt);
 		}
 		else
-			result.insert(make_pair((*item).user, true));
+			result.push_back(rslt);
 
 		item++;
 	}

@@ -42,7 +42,7 @@ int get_day_by_database(set<string>& daySet, list<string>& ignoreDay)
 				daySet.insert(string(buf));
 			else
 			{
-				if( find(ignoreDay.begin(), ignoreDay.end(), buf) != ignoreDay.end())
+				if( find(ignoreDay.begin(), ignoreDay.end(), buf) == ignoreDay.end())
 					daySet.insert(string(buf));
 			}
 		}
@@ -55,7 +55,7 @@ int get_sip_by_day(set<string>& sipSet, const char* day)
 {// select sip from dns where DATE(time) = DATE(\"2016-08-11\")
 	int t,r;
 	char query[1024];
-	snprintf(query, 1024, "select sip from dns where DATE(time) = DATE(\"%s\")", day);
+	snprintf(query, 1024, "select distinct sip from dns where DATE(time) = DATE(\"%s\")", day);
 
 	t = mysql_real_query(&mysql, query, (unsigned int)strlen(query));
 	if(t)
@@ -80,7 +80,7 @@ int get_hostname_by_sip_day(set<string>& hostnameSet, const char* sip, const cha
 {//select hostname from dns where DATE(time) = DATE("2016-08-11") and sip="192.168.220.10";
 	int t,r;
 	char query[1024];
-	snprintf(query, 1024, "select hostname from dns where DATE(time) = DATE(\"%s\") and sip=\"%s\"", day, sip);
+	snprintf(query, 1024, "select distinct hostname from dns where DATE(time) = DATE(\"%s\") and sip=\"%s\"", day, sip);
 
 	t = mysql_real_query(&mysql, query, (unsigned int)strlen(query));
 	if(t)
@@ -103,7 +103,15 @@ int get_hostname_by_sip_day(set<string>& hostnameSet, const char* sip, const cha
 
 bool hostname_filtrate(string hostname)
 {
-	if(hostname.find("qq") != string::npos)
+	if(hostname.find("www.") != string::npos ||
+		hostname.find("mail.") != string::npos ||
+		hostname.find("mailbox.") != string::npos ||
+		hostname.find("bbs.") != string::npos ||
+		hostname.find("baike.") != string::npos ||
+		hostname.find("dict.") != string::npos ||
+		hostname.find("tieba.") != string::npos ||
+		hostname.find("news.") != string::npos ||
+		hostname.find("cn.") != string::npos)
 		return false;
 
 	return true;
@@ -167,17 +175,24 @@ int database_to_item(string site, int e, map<string, list<DATA_ITEM> >& Matrix, 
 	set<string>::iterator name = name_list.begin();
 	while(name != name_list.end())
 	{
+		if((*name).size() == 0)
+		{
+			name++;
+			continue;
+		}
+
 		list<DATA_ITEM> tmp_list;
 		
 		oneItem =  itemList.begin();
 		while(oneItem != itemList.end())
 		{
-			if((*oneItem).user == *name)
+			if((*oneItem).user == *name && (*oneItem).hostname.size() != 0)
 				tmp_list.push_back(*oneItem);
 			oneItem++;
 		}
 
-		Matrix.insert(make_pair(*name, tmp_list));
+		if(tmp_list.size() != 0)
+			Matrix.insert(make_pair(*name, tmp_list));
 		name++;
 	}
 	
@@ -221,7 +236,11 @@ int get_item_by_one_day(string site, char* day, int e, list<DATA_ITEM>& itemList
 			HostnameIter++;
 		}
 
-		itemList.push_back(dIt);
+		if(dIt.hostname.size() == 0 ||
+			dIt.sip.size() == 0)
+			;
+		else
+			itemList.push_back(dIt);
 		SipIter++;
 	}
 

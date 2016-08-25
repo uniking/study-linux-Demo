@@ -23,6 +23,18 @@ string g_outFile;
 
 #define DEV_1 "p3p1"
 
+/*
+------+
+| time     | timestamp | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
+| sip      | char(32)  | YES  |     | NULL              |                             |
+| dip      | char(32)  | YES  |     | NULL              |                             |
+| hostname | char(255) | YES  |     | NULL              |                             |
++----------+-----------+------+-----+-------------------+------
+
+create table dns(time timestamp, sip char(32), dip char(32), hostname char(255));
+
+*/
+
 bool insert_log_mysql(const char* sip, const char* dip, const char* hostname);
 
 /*

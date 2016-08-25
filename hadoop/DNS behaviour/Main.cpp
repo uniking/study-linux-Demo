@@ -1,5 +1,6 @@
 #include "QueryByTime.hpp"
 #include "UserProfile.hpp"
+#include "Result.hpp"
 
 void get_yesterday(char* day, int length)
 {
@@ -17,7 +18,7 @@ void get_yesterday(char* day, int length)
 void test(CUserProfile& up)
 {
 	list<DATA_ITEM> data;
-	multimap<string, bool> result;
+	list<CResult> result;
 
 	DATA_ITEM item;
 	item.user="192.168.220.207";
@@ -32,11 +33,10 @@ void test(CUserProfile& up)
 	data.push_back(item);
 
 	up.anomie(data, result);
-	cout<<"result:"<<endl;
-	multimap<string, bool>::iterator r = result.begin();
+	list<CResult>::iterator r = result.begin();
 	while(r != result.end())
 	{
-		cout<<(*r).first<<" "<<(*r).second<<endl;
+		(*r).info();
 		r++;
 	}
 	cout<<endl;
@@ -45,17 +45,17 @@ void test(CUserProfile& up)
 void test2(CUserProfile& up)
 {
 	list<DATA_ITEM> data;
-	multimap<string, bool> result;
+	list<CResult> result;
 	char day[32];
-	snprintf(day, 32, "2016-08-12");
-	//get_yesterday(day, 32);
-	get_item_by_one_day("sxis", day, 24, data);
+	//snprintf(day, 32, "2016-08-12");
+	get_yesterday(day, 32);
+	get_item_by_one_day("sxis", day, 24, data, false);
 	up.anomie(data, result);
 	cout<<"result:"<<endl;
-	multimap<string, bool>::iterator r = result.begin();
+	list<CResult>::iterator r = result.begin();
 	while(r != result.end())
 	{
-		cout<<(*r).first<<" "<<(*r).second<<" ";
+		(*r).info();
 		r++;
 	}
 	cout<<endl;
@@ -65,18 +65,21 @@ int main()
 {
 	map<string, list<DATA_ITEM> > Matrix;
 	list<string> ignoreDay;
-	database_to_item("sxis", 24, Matrix, ignoreDay);
+	char day[32];
+	get_yesterday(day, 32);
+	ignoreDay.push_back(day);
+	cout<<"database to item"<<endl;
+	database_to_item("sxis", 24, Matrix, ignoreDay, false);
 
+	cout<<"generate model"<<endl;
 	CUserProfile up;
 	up.generate("sxis", Matrix);
 
+	cout<<"test"<<endl;
 	up.info();
 
-	test(up);
-	//test2(up);
+	//test(up);
+	test2(up);
 
-	char day[32];
-	get_yesterday(day, 32);
-	cout<<day<<endl;
 	return 0;
 }

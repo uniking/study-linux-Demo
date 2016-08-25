@@ -3,6 +3,7 @@
 
 #include "DataItem.hpp"
 #include "DNSModel.hpp"
+#include "Result.hpp"
 
 #include <map>
 #include <string>
@@ -20,7 +21,7 @@ public:
 	bool generate(string site, list<DATA_ITEM>& Matrix);
 	bool generate(string site, map<string, list<DATA_ITEM> >& Matrix);
 
-	void anomie(list<DATA_ITEM>& data, multimap<string, bool>& result);
+	void anomie(list<DATA_ITEM>& data, list<CResult>& result);
 
 	void info();
 };

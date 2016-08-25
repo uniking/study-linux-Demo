@@ -12,6 +12,9 @@ CDNSModel::CDNSModel()
 
 float CDNSModel::similarity(DATA_ITEM& first, DATA_ITEM& second)
 {
+	if(first.hostname.size() == 0 || second.hostname.size() == 0)
+		return 0;
+
 	float sum = first.hostname.size() + second.hostname.size();
 	float same_sum=0;
 	vector<string>::iterator pF = first.hostname.begin();
@@ -40,6 +43,9 @@ void CDNSModel::statistics(list<DATA_ITEM>& Matrix)
 	float max_similarity = 0;
 	float min_similarity = 1;
 	float sum_similarity = 0;
+
+	m_sum_similarity = 0;
+	m_size = Matrix.size();
 
 	list<DATA_ITEM>::iterator item = Matrix.begin();
 	while(item != Matrix.end())
@@ -82,15 +88,20 @@ bool CDNSModel::generate(string site, string user, list<DATA_ITEM>& Matrix)
 	statistics(Matrix);
 }
 
-bool CDNSModel::anomie(DATA_ITEM& item)
+CResult CDNSModel::anomie(DATA_ITEM& item)
 {
-	bool bRtn = true;
+	CResult Rtn;
 	float si = similarity(item, m_center);
 	
 	if(si >= m_min_similarity)
-		bRtn = false;
+		Rtn.m_anomie = false;
+	else
+		Rtn.m_anomie = true;
 
-	return bRtn;
+	Rtn.m_similarity = si;
+	Rtn.m_user = item.user;
+
+	return Rtn;
 }
 
 bool CDNSModel::save_model(const string& path)
@@ -105,6 +116,7 @@ bool CDNSModel::load_model(const string& path)
 
 void CDNSModel::info()
 {	
+	cout<<"size:"<<m_size<<endl;
 	cout<<"max_similarity:"<<m_max_similarity<<endl;
 	cout<<"min_similarity:"<<m_min_similarity<<endl;
 	cout<<"center item:"<<endl;
