@@ -36,13 +36,13 @@ int main(int argc, char** argv)
     int ret = 0;  
       
     //连接数据库  
-    ret = sqlite3_open("./test.db", &db);  
-    if (ret != SQLITE_OK)  
-    {  
-        fprintf(stderr, "sqlite3_open error：%s\n", sqlite3_errmsg(db));  
-        sqlite3_close(db);  
-        return 1;  
-    }  
+	ret = sqlite3_open("./test.db", &db);  
+	if (ret != SQLITE_OK)  
+	{  
+		fprintf(stderr, "sqlite3_open error：%s\n", sqlite3_errmsg(db));  
+		sqlite3_close(db);  
+		return 1;  
+	}  
     printf("sqlite3_open ok\n");  
       
     //执行建表SQL  

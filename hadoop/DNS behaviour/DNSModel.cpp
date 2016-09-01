@@ -115,12 +115,14 @@ bool CDNSModel::load_model(const string& path)
 }
 
 void CDNSModel::info()
-{	
+{
+	cout<<endl;
 	cout<<"size:"<<m_size<<endl;
 	cout<<"max_similarity:"<<m_max_similarity<<endl;
 	cout<<"min_similarity:"<<m_min_similarity<<endl;
 	cout<<"center item:"<<endl;
 	m_center.info();
+	cout<<endl;
 }
 
 

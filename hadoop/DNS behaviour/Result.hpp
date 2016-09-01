@@ -10,7 +10,8 @@ class CResult
 public:
 	string m_user;
 	bool m_anomie;
-	bool m_similarity;
+	bool m_inmodel;
+	float m_similarity;
 
 	CResult();
 	void info();

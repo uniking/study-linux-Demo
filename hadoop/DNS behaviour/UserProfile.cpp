@@ -7,13 +7,17 @@ void CUserProfile::anomie(list<DATA_ITEM>& data, list<CResult>& result)
 	{
 		map<string, CDNSModel>::iterator f = model_list.find((*item).user);
 		CResult rslt;
+		rslt.m_user=item->user;
 		if(f != model_list.end())
 		{
 			rslt = (*f).second.anomie(*item);
 			result.push_back(rslt);
 		}
 		else
+		{
+			rslt.m_inmodel=false;
 			result.push_back(rslt);
+		}
 
 		item++;
 	}
@@ -44,9 +48,12 @@ bool CUserProfile::generate(string site, list<DATA_ITEM>& Matrix)
 	map<string, list<DATA_ITEM> >::iterator matr = dispatch.begin();
 	while(matr != dispatch.end())
 	{
-		CDNSModel model;
-		model.generate(site, (*matr).first, (*matr).second);
-		model_list.insert(make_pair((*matr).first, model));
+		if((*matr).second.size() > 3)
+		{
+			CDNSModel model;
+			model.generate(site, (*matr).first, (*matr).second);
+			model_list.insert(make_pair((*matr).first, model));
+		}
 
 		matr++;
 	}

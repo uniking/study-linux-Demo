@@ -4,6 +4,8 @@ MYSQL mysql;
 MYSQL_RES *res;
 MYSQL_ROW row;
 
+#define TABLE_NAME "dns"
+
 int init_mysql()
 {
 	mysql_init(&mysql);
@@ -21,7 +23,7 @@ int get_day_by_database(set<string>& daySet, list<string>& ignoreDay)
 {
 	int t,r;
 	char query[128];
-	snprintf(query, 128, "select time from dns");
+	snprintf(query, 128, "select distinct time from %s", TABLE_NAME);
 	t = mysql_real_query(&mysql, query, (unsigned int)strlen(query));
 	if(t)
 	{
@@ -55,7 +57,7 @@ int get_sip_by_day(set<string>& sipSet, const char* day)
 {// select sip from dns where DATE(time) = DATE(\"2016-08-11\")
 	int t,r;
 	char query[1024];
-	snprintf(query, 1024, "select distinct sip from dns where DATE(time) = DATE(\"%s\")", day);
+	snprintf(query, 1024, "select distinct sip from %s where DATE(time) = DATE(\"%s\")", TABLE_NAME, day);
 
 	t = mysql_real_query(&mysql, query, (unsigned int)strlen(query));
 	if(t)
@@ -80,7 +82,7 @@ int get_hostname_by_sip_day(set<string>& hostnameSet, const char* sip, const cha
 {//select hostname from dns where DATE(time) = DATE("2016-08-11") and sip="192.168.220.10";
 	int t,r;
 	char query[1024];
-	snprintf(query, 1024, "select distinct hostname from dns where DATE(time) = DATE(\"%s\") and sip=\"%s\"", day, sip);
+	snprintf(query, 1024, "select distinct hostname from %s where DATE(time) = DATE(\"%s\") and sip=\"%s\"", TABLE_NAME, day, sip);
 
 	t = mysql_real_query(&mysql, query, (unsigned int)strlen(query));
 	if(t)
@@ -140,6 +142,7 @@ int database_to_item(string site, int e, map<string, list<DATA_ITEM> >& Matrix, 
 			dIt.e = e;
 			dIt.sip = *SipIter;
 			dIt.user = *SipIter;
+			dIt.strTime = *DayIter;
 			set<string> hostnameSet;
 			get_hostname_by_sip_day(hostnameSet, (*SipIter).c_str(), (*DayIter).c_str());
 			set<string>::iterator HostnameIter = hostnameSet.begin();

@@ -18,4 +18,14 @@ int main()
 		cout<<"not exit 2.txt\n";
 	else
 		cout<<"2 ok\n";
+
+	//read file by line
+	if(infile.is_open())
+	{
+		string s;
+		while(getline(ifile, s))
+		{
+			cout<<s<<endl;
+		}
+	}
 }

@@ -1,7 +1,9 @@
 #include<string>  
 #include<vector>  
 #include<iostream>  
-using namespace std;  
+using namespace std;
+
+
 void Tokenize(const string& str,
         vector<string>& tokens,
         const string& delimiters)
@@ -14,12 +16,14 @@ void Tokenize(const string& str,
     {  
         // Found a token, add it to the vector.  
         tokens.push_back(str.substr(lastPos, pos - lastPos));  
-        // Skip delimiters.  Note the "not_of"  
+    //     Skip delimiters.  Note the "not_of"  
         lastPos = str.find_first_not_of(delimiters, pos);  
         // Find next "non-delimiter"  
         pos = str.find_first_of(delimiters, lastPos);  
     }  
-}  
+}
+
+
 int main(int argc, char *argv[])  
 {  
     string str("====aaa==bbb=ccc=ddd====");  

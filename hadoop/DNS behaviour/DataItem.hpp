@@ -12,6 +12,7 @@ public:
 	int year;
 	int month;
 	int day;
+	string strTime;
 
 	int e;
 	string user;
@@ -23,6 +24,7 @@ public:
 		year = d.year;
 		month = d.month;
 		day = d.day;
+		strTime = d.strTime;
 
 		e = d.e;
 		sip = d.sip;
