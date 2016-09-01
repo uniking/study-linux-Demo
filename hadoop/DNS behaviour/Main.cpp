@@ -184,6 +184,11 @@ int updateItemData()
 
 	get_day_set_from_item_database(&mysql, ignoreDay);
 
+	char day[32];
+	//snprintf(day, 32, "2016-08-29");
+	get_yesterday(day, 32);
+	ignoreDay.push_back(string(day));
+
 	database_to_item("sxis", 24, Matrix, ignoreDay, false);
 
 	map<string, list<DATA_ITEM> >::iterator pUserAct = Matrix.begin();
@@ -200,8 +205,58 @@ int updateItemData()
 	}
 }
 
-int main()
+int cleanDataWarehouse()
 {
+	MYSQL mysql;
+	init_mysql(&mysql);
+	list<string> ignoreDay;
+
+	get_day_set_from_item_database(&mysql, ignoreDay);
+	delete_data_by_day(ignoreDay);
+
+	return 0;
+}
+
+void info(char* pro)
+{
+cout<<pro<<endl<<" -u update item data"<<endl<<" -d discover anomie"<<endl
+			<<" -c clean data warehouse"<<endl;
+}
+
+int main(int argn, char* argv[])
+{
+	int ret = 0;
+	if(argn == 1)
+	{
+		info(argv[0]);
+		return -1;
+	}
+	
+	string para=argv[1];
+	string update="-u";
+	string clean="-c";
+	string discover="-d";
+
+	if(para == update)
+	{
+		ret = updateItemData();
+	}
+	else if(para == clean)
+	{
+		//ret = cleanDataWarehouse();
+	}
+	else if(para == discover)
+	{
+		ret = mainTest2();
+	}
+	else
+	{
+		info(argv[0]);
+		ret = -1;
+	}
+
 	//item2database();
-	mainTest2();
+	//mainTest2();
+
+	return ret;
 }

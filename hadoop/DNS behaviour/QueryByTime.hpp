@@ -20,4 +20,6 @@ int database_to_item(string site, int e, map<string, list<DATA_ITEM> >& Matrix, 
 
 int get_item_by_one_day(string site, char* day, int e, list<DATA_ITEM>& itemList, bool filtrate=false);
 
+int delete_data_by_day(list<string>& ignoreDay);
+
 #endif //_QUERY_BY_TIME

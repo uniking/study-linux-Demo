@@ -251,3 +251,28 @@ int get_item_by_one_day(string site, char* day, int e, list<DATA_ITEM>& itemList
 	mysql_close(&mysql);
 	return 0;
 }
+
+int delete_data_by_day(list<string>& ignoreDay)
+{
+	int t,r;
+
+	if(init_mysql())
+		return 1;
+
+	list<string>::iterator pOneDay = ignoreDay.begin();
+	while(pOneDay != ignoreDay.end())
+	{
+		char query[128];
+		snprintf(query, 128, "delete from %s where DATE(time) = DATE(\"%s\")", TABLE_NAME, pOneDay->c_str());
+		t = mysql_real_query(&mysql, query, (unsigned int)strlen(query));
+		if(t)
+		{
+			printf("mysql_real_query error\n");
+		}
+
+		pOneDay++;
+	}
+
+	mysql_close(&mysql);
+	return 0;
+}
