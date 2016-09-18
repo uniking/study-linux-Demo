@@ -1,9 +1,11 @@
 #include "Result.hpp"
 
+extern bool new_user_default_anomie;
+
 CResult::CResult()
 {
 	m_user = "";
-	m_anomie = true;
+	m_anomie = new_user_default_anomie;
 	m_inmodel = true;
 	m_similarity = 0;
 }

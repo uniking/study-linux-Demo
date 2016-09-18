@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <map>
 using namespace std;
 
 class DATA_ITEM
@@ -17,7 +18,8 @@ public:
 	int e;
 	string user;
 	string sip;
-	vector<string> hostname;
+	map<string, long> hostname;//<hostname, count>
+	map<string, map<string, long>> hostname_plot; // <hostname, <time, count> >
 	vector<string> hostname_redundancy;
 
 	float mean;

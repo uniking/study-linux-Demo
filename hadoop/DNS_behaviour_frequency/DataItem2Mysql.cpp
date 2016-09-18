@@ -1,7 +1,9 @@
 #include "DataItem2Mysql.hpp"
 #include "DataItem.hpp"
 
-#define ITEM_TABLE_NAME "dnsItem"
+#define ITEM_TABLE_NAME "dfItem"
+
+// time sip dip count
 
 extern int model_shorttest_cycle;
 
@@ -20,34 +22,51 @@ int init_mysql(MYSQL* mysql)
 
 int insert_item(MYSQL* mysql, DATA_ITEM& data)
 {
-	string hostname;
 	int ret=0;
 
-	vector<string>::iterator pHostName = data.hostname.begin();
+
+	char headBuffer[512];
+	snprintf(headBuffer,512, "insert into %s(time, sip, hostname, count) value", ITEM_TABLE_NAME);
+	string Query = headBuffer;
+
+	map<string, long>::iterator pHostName = data.hostname.begin();
+	while(pHostName != data.hostname.end())
+	{//first value
+		char buf[1024];
+		if(1024 <= snprintf(buf, 1024, "(\'%s\',  \'%s\', \'%s\', \'%d\')", \
+						data.strTime.c_str(), data.sip.c_str(), pHostName->first.c_str(), pHostName->second) )
+		{
+			pHostName++;
+			continue;
+		}
+		else
+		{
+			Query += buf;
+			pHostName++;
+			break;
+		}
+	}
+
 	while(pHostName != data.hostname.end())
 	{
-		hostname+=*pHostName;
-		hostname+=" ";
+		char buf[1024];
+		if(1024 <= snprintf(buf, 1024, ",(\'%s\',  \'%s\', \'%s\', \'%d\')", \
+						data.strTime.c_str(), data.sip.c_str(), pHostName->first.c_str(), pHostName->second) )
+		{
+			pHostName++;
+			continue;
+		}
+		else
+			Query += buf;
+		
 		pHostName++;
 	}
 
-	int bLength = hostname.size() + 128;
-	char* pQuery = (char*)malloc(bLength);
-	if(pQuery)
-	{
-		snprintf(pQuery, bLength, "insert into %s(time, sip, hostname) value(\'%s\',  \'%s\', \'%s\')", ITEM_TABLE_NAME, data.strTime.c_str(), data.sip.c_str(), hostname.c_str());
-		ret = mysql_real_query(mysql, pQuery, (unsigned int)strlen(pQuery));
-		if(ret)
-		{
-			printf("mysql_real_query error\n");
-		}
 
-		free(pQuery);
-	}
-	else
+	ret = mysql_real_query(mysql, Query.c_str(), Query.size());
+	if(ret)
 	{
-		printf("malloc error\n");
-		ret = -1;
+		printf("mysql_real_query error\n");
 	}
 
 	return ret;
@@ -63,9 +82,7 @@ int query_item(MYSQL* mysql, list<string>& ignoreDay, map<string, list<DATA_ITEM
 	{
 		list<DATA_ITEM> itemList;
 		get_item_list_by_sip(mysql, *pSip, ignoreDay, itemList);
-
-		if(itemList.size() >= model_shorttest_cycle)
-			Matrix.insert(make_pair(*pSip, itemList));
+		Matrix.insert(make_pair(*pSip, itemList));
 		pSip++;
 	}
 
@@ -107,7 +124,7 @@ int get_item_list_by_sip(MYSQL* mysql, const string& sip, list<string>& ignoreDa
 	MYSQL_ROW row;
 	int t,r;
 	char query[1024];
-	snprintf(query, 1024, "select time, hostname from %s where sip=\'%s\'", ITEM_TABLE_NAME, sip.c_str());
+	snprintf(query, 1024, "select time, hostname, count from %s where sip=\'%s\'", ITEM_TABLE_NAME, sip.c_str());
 
 	t = mysql_real_query(mysql, query, (unsigned int)strlen(query));
 	if(t)
@@ -116,36 +133,24 @@ int get_item_list_by_sip(MYSQL* mysql, const string& sip, list<string>& ignoreDa
 		return 1;
 	}
 
+	DATA_ITEM di;
+	di.user = sip;
+	di.sip = sip;
 	res = mysql_store_result(mysql);
 	while(row = mysql_fetch_row(res))
-	{
-		DATA_ITEM di;
-		di.user = sip;
-		di.sip = sip;
-
-		for(t=0; t<mysql_num_fields(res); t++)
+	{		
+		map<string, map<string, long>>::iterator pF = di.hostname_plot.find(row[1]);
+		if(pF == di.hostname_plot.end())
 		{
-			if(t == 0)
-			{
-				di.strTime = row[t];
-				char buf[11];
-				memcpy(buf, row[t], 10);
-				buf[10]=0;
-
-				if(ignoreDay.size() == 0  || find(ignoreDay.begin(), ignoreDay.end(), buf) == ignoreDay.end())
-					;
-				else
-					break;
-			}
-			else if(t == 1)
-				Tokenize(string(row[t]), di.hostname, string(" "));
-			else
-				printf("query error\n");
+			map<string, long> tmp;
+			tmp.insert(make_pair(row[0], atoi(row[2])));
+			di.hostname_plot.insert(make_pair(row[1], tmp));
 		}
-
-		if(di.hostname.size() > 0)
-			itemList.push_back(di);
+		else
+			pF->second.insert(make_pair(row[0], atoi(row[2])));
 	}
+
+	itemList.push_back(di);
 
 	return 0;
 }
@@ -185,6 +190,7 @@ int get_all_item_by_one_day(MYSQL* mysql, const string& day, list<DATA_ITEM>& it
 		return 1;
 	}
 
+/*
 	res = mysql_store_result(mysql);
 	while(row = mysql_fetch_row(res))
 	{
@@ -208,6 +214,7 @@ int get_all_item_by_one_day(MYSQL* mysql, const string& day, list<DATA_ITEM>& it
 		if(di.hostname.size() > 0)
 			itemList.push_back(di);
 	}
+*/
 
 	return 0;
 }

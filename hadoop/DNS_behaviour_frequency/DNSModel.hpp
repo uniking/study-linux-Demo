@@ -9,8 +9,18 @@
 #include <list>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <algorithm>
 using namespace std;
+
+class CHostnameHav
+{
+public:
+	float min;
+	float max;
+	float mean;
+	float sd;
+};
 
 
 
@@ -19,16 +29,11 @@ class CDNSModel
 private:
 	string m_site;
 	string m_user;
-	list<DATA_ITEM> m_Matrix;
 	int m_size;
-	DATA_ITEM m_center;
-	float m_max_similarity;
-	float m_min_similarity;
-	float m_mean_similarity;
-	float m_sum_similarity;
+	int m_min_threshold;
+	map<string, CHostnameHav> m_models;
 
 	float similarity(DATA_ITEM& first, DATA_ITEM& second);
-	void statistics(list<DATA_ITEM>& Matrix);
 	void statistics(list<DATA_ITEM>& Matrix, vector<string>& redundancy);
 
 	float similarity_null_normal(DATA_ITEM& first, DATA_ITEM& second);

@@ -26,12 +26,7 @@ void test(CUserProfile& up)
 	DATA_ITEM item;
 	item.user="192.168.220.207";
 	item.sip="192.168.220.207";
-	item.hostname.push_back("d.x.baidu.com");
-	item.hostname.push_back("rch.discuz.qq.com");
-	item.hostname.push_back("rl.mail.qq.com");
-	item.hostname.push_back("uqian.qq.com");
-	item.hostname.push_back("v.qq.com");
-	item.hostname.push_back("wpa.qq.com");
+	item.hostname.insert(make_pair("d.x.baidu.com", 10) );
 
 	data.push_back(item);
 
@@ -158,12 +153,29 @@ int mainTest2()
 
 	list<string> ignoreDay;
 	char day[32];
-	snprintf(day, 32, "2016-08-29");
-	//get_yesterday(day, 32);
+	//snprintf(day, 32, "2016-08-29");
+	get_yesterday(day, 32);
 	ignoreDay.push_back(day);
 
 	init_mysql(&mysql);
 	query_item(&mysql, ignoreDay, Matrix);
+
+/*
+	{
+		map<string, list<DATA_ITEM> >::iterator ui = Matrix.begin();
+		while(ui != Matrix.end())
+		{
+			list<DATA_ITEM>::iterator di = ui->second.begin();
+			while(di != ui->second.end())
+			{
+				di->info();
+				di++;
+			}
+			ui++;
+		}
+	}
+*/
+
 
 	cout<<"generate model"<<endl;
 	CUserProfile up;
@@ -173,6 +185,7 @@ int mainTest2()
 	up.info();
 
 	test3(&mysql, up);
+
 
 	return 0;
 }
