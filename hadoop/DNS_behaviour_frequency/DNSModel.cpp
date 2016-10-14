@@ -1,6 +1,7 @@
 #include "DNSModel.hpp"
 
 extern bool null_do_normal;
+extern int model_threshold;
 
 CDNSModel::CDNSModel()
 {
@@ -141,6 +142,7 @@ void CDNSModel::clear_same_hostname(const vector<string>& constHostname, vector<
 CResult CDNSModel::anomie(DATA_ITEM& item)
 {
 	CResult Rtn;
+	Rtn.m_user = item.user;
 
 	map<string, map<string, long>>::iterator hn = item.hostname_plot.begin();
 	while(hn != item.hostname_plot.end())
@@ -153,8 +155,12 @@ CResult CDNSModel::anomie(DATA_ITEM& item)
 			{
 				CHostResult tmp;
 				tmp.m_inmodel = false;
-				tmp.m_anomie = true;				
-				Rtn.m_rsult.insert(make_pair(dc->first, tmp));
+				tmp.m_hostname = hn->first;
+				tmp.m_time = dc->first;
+
+				tmp.m_anomie = true;
+	
+				Rtn.m_result.push_back(tmp);
 				dc++;
 			}
 		}
@@ -165,13 +171,28 @@ CResult CDNSModel::anomie(DATA_ITEM& item)
 			{
 				CHostResult tmp;
 				tmp.m_inmodel = true;
+				tmp.m_hostname = hn->first;
+				tmp.m_time = dc->first;
 
-				if(dc->second > mh->second.max)
+				if(null_do_normal && 
+					dc->second < mh->second.max)
+				{
+					tmp.m_anomie = false;
+					Rtn.m_result.push_back(tmp);
+			
+					dc++;
+					continue;
+				}
+
+				long offset = dc->second > mh->second.mean ? (dc->second - mh->second.mean):(mh->second.mean - dc->second );
+				long mod_off = mh->second.max - mh->second.mean;
+
+				if(offset*100 > mod_off*(100+model_threshold))
 					tmp.m_anomie = true;
 				else
 					tmp.m_anomie = false;
 
-				Rtn.m_rsult.insert(make_pair(dc->first, tmp));
+				Rtn.m_result.push_back(tmp);
 			
 				dc++;
 			}
@@ -197,6 +218,14 @@ void CDNSModel::info()
 {
 	cout<<endl;
 	cout<<"size:"<<m_size<<endl;
+	map<string, CHostnameHav>::iterator pHH = m_models.begin();
+	cout<<"user:"<<m_user<<endl;
+	while(pHH != m_models.end())
+	{
+		cout<<"hostname:"<<pHH->first<<" min:"<<pHH->second.min<<" max:"<<pHH->second.max<<" mean:"<<pHH->second.mean<<endl;
+		pHH++;
+	}
+
 	cout<<endl;
 }
 

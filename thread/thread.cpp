@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/syscall.h>
 
 /*
 linux 内核中没有实现pthread更能，所以内核中也没有pthead.h文件，
@@ -20,7 +21,8 @@ thr_fn(void* arg)
 
 	pid = getpid();
 	tid = pthread_self();
-	printf("new thread %s pid=%u tid=%u \n", arg, (unsigned int)pid, (unsigned int)tid);
+	pid_t tid2 = syscall(SYS_gettid);
+	printf("new thread %s pid=%u tid=%u tid2=%u\n", arg, (unsigned int)pid, (unsigned int)tid, tid2);
 	for(i=0; i<30; i++)
 	{
 		sleep(1);

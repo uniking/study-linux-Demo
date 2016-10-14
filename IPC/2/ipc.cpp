@@ -12,7 +12,7 @@
 #include <pthread.h>
 #include <sys/sem.h>
 
-#define FIFO_NAME "/tmp/my_fifo"
+//share memory
 
 union semun
 {

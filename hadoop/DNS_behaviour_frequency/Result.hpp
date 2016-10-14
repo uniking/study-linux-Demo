@@ -4,11 +4,14 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <vector>
 using namespace std;
 
 class CHostResult
 {
 public:
+	string m_hostname;
+	string m_time;
 	bool m_anomie;
 	bool m_inmodel;
 
@@ -23,7 +26,8 @@ public:
 	bool m_anomie;
 	bool m_inmodel;
 	float m_similarity;
-	map<string, CHostResult> m_rsult;//<time, result>
+
+	vector<CHostResult> m_result;//<time, result>
 
 	CResult();
 	void info();

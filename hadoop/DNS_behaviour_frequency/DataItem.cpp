@@ -2,7 +2,7 @@
 
 void DATA_ITEM::info()
 {
-	cout<<"time:"<<strTime<<" user:"<<user<<" sip:"<<sip<<" hostname:"<<endl;
+	cout<<"sip:"<<sip<<endl;
 	map<string, long>::iterator h = hostname.begin();
 	while(h != hostname.end())
 	{

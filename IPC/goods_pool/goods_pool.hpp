@@ -25,24 +25,26 @@ using namespace std;
 class CGoodsPool
 {
 private:
-  union semun
-{
-	int val;
-	struct semid_ds *buf;
-	unsigned short *arry;
-};
+	union semun
+	{
+		int val;
+		struct semid_ds *buf;
+		unsigned short *arry;
+	};
 
-  GOODS_POOL m_pool;
-  int m_sem_id;
-  pthread_mutex_t m_lock;
-  
-  int semaphore_v();
-  int semaphore_p();
-  int set_semvalue();
+	GOODS_POOL m_pool;
+	int m_sem_id;
+	pthread_mutex_t m_lock;
+	int m_mutex_result;
+
+	int semaphore_v();
+	int semaphore_p();
+	int set_semvalue();
 public:
-  CGoodsPool(int key);
-  ~CGoodsPool();
-  
-  GOODS get_goods();
-  void put_goods(GOODS goods);
+	CGoodsPool(int key);
+	~CGoodsPool();
+
+	GOODS get_goods();
+	void put_goods(GOODS goods);
+	int size();
 };

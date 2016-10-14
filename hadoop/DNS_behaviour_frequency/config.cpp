@@ -3,6 +3,8 @@
 int model_shorttest_cycle=5;
 bool new_user_default_anomie=false;
 bool null_do_normal = true;
+int model_threshold = 0;
+int min_count = 0;
 
 #define CONFIG_PATH "./dns_model.ini"
 
@@ -43,4 +45,6 @@ int init_config(char* config_path)
 	model_shorttest_cycle = root_json["MODEL_SHORTTEST_CYCLE"].asInt();
 	new_user_default_anomie = root_json["DEFAULT_ANOMIE"].asBool();
 	null_do_normal = root_json["NULL_DO_NORMAL"].asBool();
+	model_threshold = root_json["THRESHOLD"].asInt();
+	min_count = root_json["MIN_COUNT"].asInt();
 }

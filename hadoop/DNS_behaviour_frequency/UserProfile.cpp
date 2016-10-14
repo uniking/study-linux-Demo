@@ -7,17 +7,25 @@ void CUserProfile::anomie(list<DATA_ITEM>& data, list<CResult>& result)
 	{
 		map<string, CDNSModel>::iterator f = model_list.find((*item).user);
 		CResult rslt;
-		rslt.m_user=item->user;
 		if(f != model_list.end())
 		{
-			rslt = (*f).second.anomie(*item);
-			result.push_back(rslt);
+			if(item->hostname_plot.size() == 0)
+			{
+				rslt.m_user=item->user;
+				rslt.m_inmodel = true;
+				rslt.m_anomie = false;
+			}
+			else
+			{
+				rslt = (*f).second.anomie(*item);
+			}
 		}
 		else
 		{
+			rslt.m_user=item->user;
 			rslt.m_inmodel=false;
-			result.push_back(rslt);
 		}
+		result.push_back(rslt);
 
 		item++;
 	}

@@ -31,7 +31,7 @@ private:
 	string m_user;
 	int m_size;
 	int m_min_threshold;
-	map<string, CHostnameHav> m_models;
+	map<string, CHostnameHav> m_models; //<hostname, stat>
 
 	float similarity(DATA_ITEM& first, DATA_ITEM& second);
 	void statistics(list<DATA_ITEM>& Matrix, vector<string>& redundancy);

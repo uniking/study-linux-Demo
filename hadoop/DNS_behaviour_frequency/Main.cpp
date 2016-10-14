@@ -71,11 +71,26 @@ void test2(CUserProfile& up)
 void test3(MYSQL* mysql, CUserProfile& up)
 {
 	list<DATA_ITEM> data;
+	map<string, list<DATA_ITEM> > Matrix;
 	list<CResult> result;
 	char day[32];
 	snprintf(day, 32, "2016-08-29");
 	//get_yesterday(day, 32);
-	get_all_item_by_one_day(mysql, string(day), data);
+	get_all_item_by_one_day(mysql, string(day), Matrix);
+
+	map<string, list<DATA_ITEM> >::iterator uh = Matrix.begin();
+	while(uh != Matrix.end())
+	{
+		list<DATA_ITEM>::iterator hi = uh->second.begin();
+		while(hi != uh->second.end())
+		{
+			data.push_back(*hi);
+			hi++;
+		}
+		
+		uh++;
+	}
+
 
 	cout<<"test item inf:"<<endl;
 	list<DATA_ITEM>::iterator pI = data.begin();
@@ -94,6 +109,7 @@ void test3(MYSQL* mysql, CUserProfile& up)
 		r++;
 	}
 	cout<<endl;
+
 }
 
 int item2database()
@@ -128,7 +144,7 @@ int mainTest()
 	list<string> ignoreDay;
 	char day[32];
 	snprintf(day, 32, "2016-08-29");
-	//get_yesterday(day, 32);
+	get_yesterday(day, 32);
 	ignoreDay.push_back(day);
 	cout<<"database to item"<<endl;
 	database_to_item("sxis", 24, Matrix, ignoreDay, false);
@@ -153,9 +169,9 @@ int mainTest2()
 
 	list<string> ignoreDay;
 	char day[32];
-	//snprintf(day, 32, "2016-08-29");
-	get_yesterday(day, 32);
-	ignoreDay.push_back(day);
+	snprintf(day, 32, "2016-08-29");
+	//get_yesterday(day, 32);
+	ignoreDay.push_back( string(day) );
 
 	init_mysql(&mysql);
 	query_item(&mysql, ignoreDay, Matrix);

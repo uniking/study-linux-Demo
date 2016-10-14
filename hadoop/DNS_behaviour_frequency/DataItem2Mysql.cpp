@@ -3,6 +3,8 @@
 
 #define ITEM_TABLE_NAME "dfItem"
 
+extern int min_count;
+
 // time sip dip count
 
 extern int model_shorttest_cycle;
@@ -118,13 +120,98 @@ int get_sip(MYSQL* mysql, set<string>& sipSet)
 	return 0;
 }
 
+int get_sip_by_date(MYSQL* mysql, const string& day, set<string>& sipSet)
+{// select sip from dns where DATE(time) = DATE(\"2016-08-11\")
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	int t,r;
+	char query[1024];
+	snprintf(query, 1024, "select distinct sip from %s where DATE(time) = DATE(\"%s\")", ITEM_TABLE_NAME, day.c_str());
+
+	t = mysql_real_query(mysql, query, (unsigned int)strlen(query));
+	if(t)
+	{
+		printf("mysql_real_query error\n");
+		return 1;
+	}
+
+	res = mysql_store_result(mysql);
+	while(row = mysql_fetch_row(res))
+	{
+		for(t=0; t<mysql_num_fields(res); t++)
+		{
+			sipSet.insert(string(row[t]));
+		}
+	}
+
+	return 0;
+}
+
 int get_item_list_by_sip(MYSQL* mysql, const string& sip, list<string>& ignoreDay, list<DATA_ITEM>& itemList)
 {
 	MYSQL_RES *res;
 	MYSQL_ROW row;
 	int t,r;
 	char query[1024];
-	snprintf(query, 1024, "select time, hostname, count from %s where sip=\'%s\'", ITEM_TABLE_NAME, sip.c_str());
+	snprintf(query, 1024, "select time, hostname, count from %s where sip=\'%s\' and count>%d", ITEM_TABLE_NAME, sip.c_str(), min_count);
+
+	t = mysql_real_query(mysql, query, (unsigned int)strlen(query));
+	if(t)
+	{
+		printf("mysql_real_query error\n");
+		return 1;
+	}
+
+	DATA_ITEM di;
+	di.user = sip;
+	di.sip = sip;
+	res = mysql_store_result(mysql);
+	while(row = mysql_fetch_row(res))
+	{
+
+		list<string>::iterator pI = find(ignoreDay.begin(), ignoreDay.end(), row[0]);
+		if(pI != ignoreDay.end())
+			continue;
+
+/*
+		bool bIg = false;
+		list<string>::iterator pI = ignoreDay.begin();
+		while(pI != ignoreDay.end())
+		{
+			if(*pI == row[0])
+			{
+				bIg = true;
+				break;
+			}
+			pI++;
+		}
+		if(bIg == true)
+			continue;
+*/
+
+		map<string, map<string, long>>::iterator pF = di.hostname_plot.find(row[1]);
+		if(pF == di.hostname_plot.end())
+		{
+			map<string, long> tmp;
+			tmp.insert(make_pair(row[0], atoi(row[2])));
+			di.hostname_plot.insert(make_pair(row[1], tmp));
+		}
+		else
+			pF->second.insert(make_pair(row[0], atoi(row[2])));
+	}
+
+	itemList.push_back(di);
+
+	return 0;
+}
+
+int get_item_list_by_sip_and_day(MYSQL* mysql, const string& sip, const string& day, list<DATA_ITEM>& itemList)
+{
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	int t,r;
+	char query[1024];
+	snprintf(query, 1024, "select time, hostname, count from %s where sip=\'%s\' and DATE(time) = DATE(\"%s\") and count > %d", ITEM_TABLE_NAME, sip.c_str(), day.c_str(), min_count);
 
 	t = mysql_real_query(mysql, query, (unsigned int)strlen(query));
 	if(t)
@@ -175,46 +262,20 @@ void Tokenize(const string& str,
     }  
 }
 
-int get_all_item_by_one_day(MYSQL* mysql, const string& day, list<DATA_ITEM>& itemList)
+int get_all_item_by_one_day(MYSQL* mysql, const string& day, map<string, list<DATA_ITEM> >& Matrix)
 {
-	MYSQL_RES *res;
-	MYSQL_ROW row;
-	int t,r;
-	char query[1024];
-	snprintf(query, 1024, "select time, sip, hostname from %s where DATE(time) = DATE(\"%s\")", ITEM_TABLE_NAME, day.c_str());
+	list<string> ignoreDay;
+	set<string> sipSet;
+	get_sip_by_date(mysql, day, sipSet);
 
-	t = mysql_real_query(mysql, query, (unsigned int)strlen(query));
-	if(t)
+	set<string>::iterator pSip = sipSet.begin();
+	while(pSip != sipSet.end())
 	{
-		printf("mysql_real_query error\n");
-		return 1;
+		list<DATA_ITEM> itemList;
+		get_item_list_by_sip_and_day(mysql, *pSip, day, itemList);
+		Matrix.insert(make_pair(*pSip, itemList));
+		pSip++;
 	}
-
-/*
-	res = mysql_store_result(mysql);
-	while(row = mysql_fetch_row(res))
-	{
-		DATA_ITEM di;
-
-		for(t=0; t<mysql_num_fields(res); t++)
-		{
-			if(t == 0)
-				di.strTime = row[t];
-			else if(t == 1)
-			{
-				di.sip = row[t];
-				di.user = di.sip;
-			}
-			else if(t == 2)
-				Tokenize(string(row[t]), di.hostname, string(" "));
-			else
-				printf("query error\n");
-		}
-
-		if(di.hostname.size() > 0)
-			itemList.push_back(di);
-	}
-*/
 
 	return 0;
 }

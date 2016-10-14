@@ -20,16 +20,16 @@ int CGoodsPool::semaphore_p()
 	sem_b.sem_op = -1;
 	sem_b.sem_flg = SEM_UNDO;
 
-    while(semop(m_sem_id, &sem_b, 1) == -1)
-    {
-        if(errno == EINTR)
-                continue;// interupted system call错误，
-            else
-        {
-            printf("semaphore_p error %m\n");
-                exit(-1);
-        }
-    }
+	while(semop(m_sem_id, &sem_b, 1) == -1)
+	{
+		if(errno == EINTR)
+			continue;
+		else
+		{
+			printf("semaphore_p error %m\n");
+			exit(-1);
+		}
+	}
 
 	return 0;
 }
@@ -41,16 +41,16 @@ int CGoodsPool::semaphore_v()
 	sem_b.sem_op = 1;
 	sem_b.sem_flg = SEM_UNDO;
 
-    while(semop(m_sem_id, &sem_b, 1) == -1)
-    {
-        if(errno == EINTR)
-                continue;
-            else
-        {
-            printf("semaphore_p error %m\n");
-                exit(-1);
-        }
-    }
+	while(semop(m_sem_id, &sem_b, 1) == -1)
+	{
+		if(errno == EINTR)
+			continue;
+		else
+		{
+			printf("semaphore_p error %m\n");
+			exit(-1);
+		}
+	}
 
 	return 0;
 }
@@ -58,10 +58,10 @@ int CGoodsPool::semaphore_v()
 // key 1234
 CGoodsPool::CGoodsPool(int key)
 {
-  m_sem_id = 0;
-  m_sem_id = semget((key_t)key, 1, 0666 | IPC_CREAT);
-  set_semvalue();
-  pthread_mutex_init(&m_lock, NULL);
+	m_sem_id = 0;
+	m_sem_id = semget((key_t)key, 1, 0666 | IPC_CREAT);
+	set_semvalue();
+	m_mutex_result = pthread_mutex_init(&m_lock, NULL);
 }
 
 CGoodsPool::~CGoodsPool()
@@ -70,21 +70,31 @@ CGoodsPool::~CGoodsPool()
 
 void CGoodsPool::put_goods(GOODS goods)
 {
-  pthread_mutex_lock(&m_lock);
-  m_pool.push_back(goods);
-  pthread_mutex_unlock(&m_lock);
-  
-  semaphore_v();
+	pthread_mutex_lock(&m_lock);
+	m_pool.push_back(goods);
+	pthread_mutex_unlock(&m_lock);
+
+	semaphore_v();
 }
 
 GOODS CGoodsPool::get_goods()
 {
-  semaphore_p();
-  
-  pthread_mutex_lock(&m_lock);
-  GOODS tmp = m_pool.front();
-  m_pool.pop_front();
-  pthread_mutex_unlock(&m_lock);
-    
-  return tmp;
+	semaphore_p();
+
+	pthread_mutex_lock(&m_lock);
+	if(m_pool.empty())
+	{
+		pthread_mutex_unlock(&m_lock);
+		return (GOODS)NULL;
+	}
+	GOODS tmp = m_pool.front();
+	m_pool.pop_front();
+	pthread_mutex_unlock(&m_lock);
+
+	return tmp;
+}
+
+int CGoodsPool::size()
+{
+	return m_pool.size();
 }

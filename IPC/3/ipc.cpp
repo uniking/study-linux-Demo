@@ -12,7 +12,7 @@
 #include <pthread.h>
 #include <sys/shm.h>
 
-#define FIFO_NAME "/tmp/my_fifo"
+//share memory
 
 int main()
 {
