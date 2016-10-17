@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 typedef map<int, map<string, float> > model_type;//<top,<word,pro>>
@@ -216,6 +217,43 @@ int collect_test()
 	return 0;
 }
 
+bool large_second(string a, string b)
+{
+	return a > b;
+}
+void print_top_sim(char* theta)
+{
+	ifstream infile(theta);
+
+	//read file by line
+	if(infile.is_open())
+	{
+		string s;
+		int index = 1;
+		while(getline(infile, s))
+		{
+			vector<string> tokens;
+			Tokenize(s, tokens, " ");
+			sort(tokens.begin(), tokens.end(), large_second);
+
+			int remain = tokens.size() / 10;
+			int count = 0;
+			double sum = 0;
+			vector<string>::iterator pn = tokens.begin();
+			while(pn != tokens.end() && count < remain)
+			{
+				sum += atof(pn->c_str());
+				count++;
+				pn++;
+			}
+
+			if(sum < 0.3)
+				cout<<index<<" "<<sum<<endl;
+			index++;
+		}
+	}
+}
+
 int sim_test()
 {
 	model_type modelA;
@@ -228,7 +266,9 @@ int sim_test()
 
 int main()
 {
-	sim_test();
+	//sim_test();
 	//collect_test();
+
+	print_top_sim("test_new.data.theta");
 	return 0;
 }
