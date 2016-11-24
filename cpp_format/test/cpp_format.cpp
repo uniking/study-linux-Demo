@@ -1,4 +1,5 @@
 #include "FileSystem.hpp"
+#include "tuckunder.hpp"
 #include <string.h>
 
 #include <string>
@@ -204,6 +205,8 @@ void format(string filepath)
 
 	delete_enter_tail(content);
 	delete_enter_between_enter(content);
+
+	add_tuckunder(content);
 	cout<<content<<endl;
 	
 }
