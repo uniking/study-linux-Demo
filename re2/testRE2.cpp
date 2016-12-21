@@ -26,7 +26,7 @@ void printlog(bool bT)
 
 int main()
 {
-	ifstream inFile("./phone.txt");
+	ifstream inFile("./CPrimerPlus.txt");
 	string sContent;
 	ostringstream os;
 	os << inFile.rdbuf();
@@ -49,7 +49,7 @@ int main()
 	//sleep(10);
 	//int e = clock () ;
 
-    string strTemp="";
+    //string strTemp="";
     int i=0;
    re2::StringPiece input((char*)sContent.c_str());
    //re2::StringPiece input("11111111111111111111111111111");
@@ -61,11 +61,11 @@ int main()
 
     cout<<"count:"<<sContent<<endl;
     //while(RE2::FindAndConsume(&input, "(<\\w+>)", &strTemp))
-    //while(RE2::FindAndConsume(&input, "([1-9]\d{5}(?!\d))", &strTemp))
-	//{
-	//	i++;
-	//	cout<< endl<<strTemp.c_str()<<endl;
-	//}
+    while(RE2::FindAndConsume(&input, "fsdfsdfsd", &strTemp))
+	{
+		i++;
+		cout<< endl<<strTemp.c_str()<<endl;
+	}
 
 
 /*
@@ -157,17 +157,17 @@ int main()
 	*/
 
 	//返回匹配的偏移量
-	std::string test="sip:192.168.220.10";
-	re2::StringPiece result;
+	//std::string test="sip:192.168.220.10";
+	//re2::StringPiece result;
 	//if( RE2::PartialMatch(test, "(<\\w+>)", &result) )
 	//	std::cout<<"first at "<< result.data()- test.data() << endl;
 
-	if( RE2::PartialMatch(test, "(sip:\\d+.\\d+.\\d+.\\d+)", &result) )
-		std::cout<<"first at "<< result.data()- test.data() << result<<endl;
+	//if( RE2::PartialMatch(test, "(sip:\\d+.\\d+.\\d+.\\d+)", &result) )
+	//	std::cout<<"first at "<< result.data()- test.data() << result<<endl;
 
-	re2::StringPiece input2((char*)test.c_str());
-	RE2::FindAndConsume(&input2, "(sip:\\d+.\\d+.\\d+.\\d+)", &result);
-	cout<<result<<endl;
+	//re2::StringPiece input2((char*)test.c_str());
+	//RE2::FindAndConsume(&input2, "(sip:\\d+.\\d+.\\d+.\\d+)", &result);
+	//cout<<result<<endl;
 
 	return 0;
 }
