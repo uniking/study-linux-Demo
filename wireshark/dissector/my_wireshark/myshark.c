@@ -98,6 +98,9 @@ gboolean read_packet(epan_dissect_t **edt_r)
 		frame_data_init(&fdlocal, cfile.count, whdr, data_offset, cum_bytes);
 
 		edt = epan_dissect_new(cfile.epan, TRUE, TRUE);
+		//edt = epan_dissect_new(cfile.epan, TRUE, FALSE);
+		//edt = epan_dissect_new(cfile.epan, FALSE, TRUE);
+		//edt = epan_dissect_new(cfile.epan, FALSE, FALSE);
 
 		frame_data_set_before_dissect(&fdlocal, &cfile.elapsed_time, &cfile.ref, cfile.prev_dis);
 		cfile.ref = &fdlocal;
