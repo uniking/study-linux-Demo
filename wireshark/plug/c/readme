@@ -1,0 +1,5 @@
+new_create_dissector_handle
+
+/* Add an entry to a uint dissector table. */
+./epan/packet.h:WS_DLL_PUBLIC void dissector_add_uint(const char *name, const guint32 pattern,
+

@@ -1,0 +1,108 @@
+/*
+ * Higher-level packet-printing code.
+ */
+./wireshark/epan/print.h:WS_DLL_PUBLIC gboolean proto_tree_print(print_args_t *print_args, epan_dissect_t *edt,
+
+./wireshark/epan/print.h:WS_DLL_PUBLIC void proto_tree_write_pdml(epan_dissect_t *edt, FILE *fh);
+
+/**
+ * Called when the program starts, to enable security features and save
+ * whatever credential information we'll need later.
+ */
+./wsutil/privileges.h:WS_DLL_PUBLIC void init_process_policies(void);
+
+/** init the whole epan module, this is used to be called only once in a program */
+./epan/epan.h:void epan_init(void (*register_all_protocols_func)(register_cb cb, gpointer client_data),
+
+./wireshark/epan/register.h:WS_DLL_PUBLIC void register_all_protocols(register_cb cb, gpointer client_data);
+
+./wireshark/epan/register.h:WS_DLL_PUBLIC void register_all_protocol_handoffs(register_cb cb, gpointer client_data);
+
+/** On failure, "wtap_open_offline()" returns NULL, and puts into the
+ * "int" pointed to by its second argument:
+ *
+ * @param filename Name of the file to open
+ * @param type WTAP_TYPE_AUTO for automatic recognize file format or explicit choose format type
+ * @param err a positive "errno" value if the capture file can't be opened;
+ * a negative number, indicating the type of error, on other failures.
+ * @param err_info for some errors, a string giving more details of
+ * the error
+ * @param do_random TRUE if random access to the file will be done,
+ * FALSE if not
+ */
+./wiretap/wtap.h:struct wtap* wtap_open_offline(const char *filename, unsigned int type, int *err,
+
+/** A client will create one epan_t for an entire dissection session.
+ * A single epan_t will be used to analyze the entire sequence of packets,
+ * sequentially, in a single session. A session corresponds to a single
+ * packet trace file. The reaons epan_t exists is that some packets in
+ * some protocols cannot be decoded without knowledge of previous packets.
+ * This inter-packet "state" is stored in the epan_t.
+ */
+./epan/epan.h:WS_DLL_PUBLIC epan_t *epan_new(void);
+
+/*** get various information snippets about the current packet ***/
+./wireshark/wiretap/wtap.h:struct wtap_pkthdr *wtap_phdr(wtap *wth);
+
+./wireshark/wiretap/wtap.h:guint8 *wtap_buf_ptr(wtap *wth);
+
+
+/** Returns TRUE if read was successful. FALSE if failure. data_offset is
+ * set to the offset in the file where the data for the read packet is
+ * located. */
+./wireshark/wiretap/wtap.h:gboolean wtap_read(wtap *wth, int *err, gchar **err_info,
+
+./wireshark/epan/frame_data.h:WS_DLL_PUBLIC void frame_data_init(frame_data *fdata, guint32 num,
+
+
+/** get a new single packet dissection
+ * should be freed using epan_dissect_free() after packet dissection completed
+ */
+./wireshark/epan/epan.h:epan_dissect_new(epan_t *session, const gboolean create_proto_tree, const gboolean proto_tree_visible);
+
+/**
+ * Sets the frame data struct values before dissection.
+ */
+./wireshark/epan/frame_data.h:WS_DLL_PUBLIC void frame_data_set_before_dissect(frame_data *fdata,
+
+/** run a single packet dissection */
+./wireshark/epan/epan.h:epan_dissect_run(epan_dissect_t *edt, int file_type_subtype,
+
+./wireshark/epan/frame_data.h:WS_DLL_PUBLIC void frame_data_set_after_dissect(frame_data *fdata,
+
+./wireshark/epan/frame_data_sequence.h:WS_DLL_PUBLIC frame_data *frame_data_sequence_add(frame_data_sequence *fds,
+
+./wireshark/epan/frame_data.h:WS_DLL_PUBLIC void frame_data_destroy(frame_data *fdata);
+
+/*
+ * Find the frame_data for the specified frame number.
+ */
+./wireshark/epan/frame_data_sequence.h:WS_DLL_PUBLIC frame_data *frame_data_sequence_find(frame_data_sequence *fds,
+
+
+./lib.h:static void timestamp_set(capture_file cfile);
+
+./wireshark/epan/timestamp.h:WS_DLL_PUBLIC void timestamp_set_precision(int tsp);
+
+/* Read the preferences file, fill in "prefs", and return a pointer to it.
+
+   If we got an error (other than "it doesn't exist") trying to read
+   the global preferences file, stuff the errno into "*gpf_errno_return"
+   on an open error and into "*gpf_read_errno_return" on a read error,
+   stuff a pointer to the path of the file into "*gpf_path_return", and
+   return NULL.
+
+   If we got an error (other than "it doesn't exist") trying to read
+   the user's preferences file, stuff the errno into "*pf_errno_return"
+   on an open error and into "*pf_read_errno_return" on a read error,
+   stuff a pointer to the path of the file into "*pf_path_return", and
+   return NULL. */
+./wireshark/epan/prefs.h:WS_DLL_PUBLIC e_prefs *read_prefs(int *, int *, char **, int *, int *, char **);
+
+./wireshark/epan/column.h:build_column_format_array(column_info *cinfo, const gint num_cols, const gboolean reset_fences);
+
+./wireshark/epan/epan/frame_data_sequence.h:WS_DLL_PUBLIC void free_frame_data_sequence(frame_data_sequence *fds);
+
+./wireshark/wiretap/wtap.h:void wtap_close(wtap *wth);
+
+./wireshark/epan/epan.h:void epan_cleanup(void);
