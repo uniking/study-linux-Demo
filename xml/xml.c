@@ -5,6 +5,7 @@
 xmlDocPtr  getdoc(char *docname)
 {
 	xmlDocPtr doc;
+	//doc = xmlParseMemory(buffer, size);
 	doc = xmlParseFile(docname);
 
 	if (doc == NULL )
