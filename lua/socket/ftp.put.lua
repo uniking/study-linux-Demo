@@ -6,9 +6,9 @@ local ltn12 = require("ltn12")
 -- using password "silva", and append to the remote file "LOG", sending the
 -- contents of the local file "LOCAL-LOG"
 f, e = ftp.put{
-	host = "192.168.220.177", 
-	user = "admin",
-	password = "abcd",
+	host = "192.168.220.230", 
+	user = "wangzl",
+	password = "zxcv",
 	path="ftp.put.lua",
 	source = ltn12.source.file(io.open("./ftp.put.lua", "r"))
 }
