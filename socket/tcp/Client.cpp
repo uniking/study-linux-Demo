@@ -13,7 +13,7 @@ int port = 8000;
 
 int main(int argc, char *argv[])
 {
-  struct sockaddr pin={0};
+  struct sockaddr_in pin={0};
   int sock_fd;
   char buf[MAXLINE];
   char str[MAXLINE];
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
   pin.sin_port = htons(port);
   
   sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-  n=connect(sock_fd, &pin, sizeof(pin));
+  n=connect(sock_fd, (const sockaddr*)&pin, sizeof(pin));
   if (-1 == n)
   {
      perror("call connect");
