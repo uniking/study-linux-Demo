@@ -23,7 +23,7 @@ int main(void)
 	int maxi;
 	int max;
 	int client[FD_SETSIZE];
-	int address_size = sizeof(pin);
+	socklen_t address_size = sizeof(pin);
 	char buf[MAXLINE];
 	char str[INET_ADDRSTRLEN];
 	int i;
