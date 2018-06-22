@@ -8,7 +8,8 @@ using namespace std;
 
 int main()
 {
-	FILE* process_file  = popen("/usr/bin/ls /home/sxis", "r");
+	//FILE* process_file  = popen("/usr/bin/ls /home/sxis", "r");
+	FILE* process_file  = popen("/usr/bin/top -n 1 | wc", "r");
 	if(process_file == NULL)
 	{
 		cout<<"popen error"<<endl;

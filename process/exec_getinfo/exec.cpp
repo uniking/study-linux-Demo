@@ -1,9 +1,12 @@
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 #include <string>
 #include <iostream>
 using namespace std;
+
+
 
 int exec_args_ext(const char* cmd, const char* param, string &output)
 {
@@ -22,6 +25,7 @@ int exec_args_ext(const char* cmd, const char* param, string &output)
 		dup2(pipefd[1], 1);  // send stdout to the pipe
 		close(pipefd[1]);    // this descriptor is no longer needed
 
+
 		int dev_null_fd = open("/dev/null", 0);
 		if (dev_null_fd > 0)
 		{
@@ -29,7 +33,12 @@ int exec_args_ext(const char* cmd, const char* param, string &output)
 			close(dev_null_fd);
 		}
 
-		execl(cmd, param);
+		execl("/usr/bin/top", "/usr/bin/top", "-n", "1", NULL);
+
+		//execl(cmd, cmd, "-al", "/home", NULL);
+		//execl(cmd, cmd, param, NULL);
+		
+		exit(0);
 	}
 	else
 	{ // parent
@@ -37,7 +46,7 @@ int exec_args_ext(const char* cmd, const char* param, string &output)
 		char buffer[1024] = {0};
 		ssize_t len;
 		while((len = read(pipefd[0], buffer, 1024)) > 0)
-		{
+		{//len always equal 0
 			output += string(buffer, len);
 			if (output.size() >= (256 * 1024)) // output no more than 256KB
 				break;
@@ -50,8 +59,8 @@ int exec_args_ext(const char* cmd, const char* param, string &output)
 
 int main()
 {
-	string output;
-	exec_args_ext("/usr/bin/ls", "/", output);
+	string output="";
+	exec_args_ext("/bin/ls", "/", output);
 	cout<<output<<endl;
 
 	return 0;
