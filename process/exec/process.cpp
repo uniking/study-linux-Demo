@@ -26,7 +26,7 @@ int main()
 	if(pid == 0)
 	{//child
 		say_hello("child", 5);
-		execl("/use/bin/ls", "/home/sxis");
+		execl("/use/bin/ls", "ls", "/home/sxis", NULL);
 	}
 	else
 	{//parent
