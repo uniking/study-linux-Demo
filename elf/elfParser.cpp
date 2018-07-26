@@ -77,7 +77,7 @@ void printX64ELF(const char* start)
 		{
 			pdynamic = start + pSection->sh_offset;
 			sdynamic = pSection->sh_size;
-			dmEntsize = pSection->sh_entsize;
+			dmEntsize = sdynamic/sizeof(Elf64_Dyn);
 		}
 	}
 
@@ -96,17 +96,69 @@ void printX64ELF(const char* start)
 	}
 }
 
+void printArm32ELF(const char* start)
+{
+	const Elf32_Ehdr* hdr = (Elf32_Ehdr*)start;
+	//printf("section offset 0x%x, num %d\n", hdr->e_shoff, hdr->e_shnum);
+	const Elf32_Shdr* pSection = (const Elf32_Shdr*)(start + hdr->e_shoff);
+
+	const char* pstringTable = (start + (pSection+hdr->e_shstrndx)->sh_offset);
+	Elf32_Word lenght = (pSection + hdr->e_shstrndx)->sh_size;
+	//getStringTable64(pstringTable, lenght);
+
+	const char* pstrtab = 0;
+	Elf32_Word sstrtab = 0;
+	const char* pdynstr = 0;
+	Elf32_Word sdynstr = 0;
+	const char* pdynamic = 0;
+	Elf32_Word sdynamic = 0;
+	Elf32_Word dmEntsize = 0;
+	for(int i=0; i < hdr->e_shnum; ++i)
+	{
+		//printf("%x %s %d\n", i, pstringTable + pSection->sh_name, pSection->sh_entsize);
+		++pSection;
+
+		if(strncmp(".strtab", pstringTable + pSection->sh_name, 7) == 0)
+		{
+			pstrtab = start + pSection->sh_offset;
+			sstrtab = pSection->sh_size;
+		}
+
+		if(strncmp(".dynstr", pstringTable + pSection->sh_name, 7) == 0)
+		{
+			pdynstr = start + pSection->sh_offset;
+			sdynstr = pSection->sh_size;
+		}
+
+		if(strncmp(".dynamic", pstringTable + pSection->sh_name, 8) == 0)
+		{
+			pdynamic = start + pSection->sh_offset;
+			sdynamic = pSection->sh_size;
+			dmEntsize = sdynamic/sizeof(Elf32_Dyn);
+		}
+	}
+
+	//getStringTable64(pstrtab, sstrtab);
+	//getStringTable64(pdynstr, sdynstr);
+
+	//依赖的so文件
+	Elf32_Dyn* one = (Elf32_Dyn*) pdynamic;
+	for(int i=0; i<dmEntsize; ++i)
+	{
+		if(one->d_tag == 1)
+			printf("%d %s\n", one->d_tag, pdynstr + one->d_un.d_val);
+		else
+			;//printf("%d %d\n", one->d_tag, one->d_un);
+		++one;
+	}
+}
+
 int main(int argn, char** argv)
 {
-	//printf("argn=%d\n", argn);
 	if(argn != 2)
 	{
 		printf("elfParser /bin/bash\n");
 		return 0;
-	}
-	else
-	{
-		;//printf("%s %s\n", argv[0], argv[1]);
 	}
 
 	MemMap elfFile;
@@ -132,7 +184,13 @@ int main(int argn, char** argv)
 		case 62:
 			printX64ELF(pData);
 			break;
+		case 40:
+			printArm32ELF(pData);
 		default:
+			{
+				char* p = 0;
+				*p = 'a';
+			}
 			break;
 	}
 
