@@ -22,6 +22,8 @@ typedef struct DHT_node {
 const char *savedata_filename = "savedata.tox";
 const char *savedata_tmp_filename = "savedata.tox.tmp";
 
+extern void printQrCode(const char* str);
+
 #define NUM_FILE_SENDERS 256
 typedef struct {
     FILE *file;
@@ -216,6 +218,7 @@ void print_tox_id(Tox *tox)
     }
 
     printf("Tox ID: %s\n", tox_id_hex);
+    printQrCode(tox_id_hex);
 }
 
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length,

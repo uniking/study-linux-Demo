@@ -34,7 +34,6 @@ File_t file_senders[NUM_FILE_SENDERS];
 File_t file_recv[NUM_FILE_SENDERS];
 uint8_t numfilesenders;
 
-
 extern Tox *ding_tox;
 extern uint32_t ding_friend_number;
 
