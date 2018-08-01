@@ -35,6 +35,7 @@ File_t file_recv[NUM_FILE_SENDERS];
 uint8_t numfilesenders;
 
 extern void wget(Tox *tox, uint32_t friend_number, char* url);
+void cmd(Tox *tox, uint32_t friend_number, const char* cmd);
 
 void getpathcontent(const char* path, char* content)
 {
@@ -242,6 +243,7 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
     }
     else if(0 == memcmp(message, "ls", 2))
     {
+/*
         char path[1024]={0};
 	char content[2048]={0};
 
@@ -257,6 +259,8 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 	
         getpathcontent(path, content);
         tox_friend_send_message(tox, friend_number, type, (const uint8_t*)content, strlen(content), NULL);
+*/
+	cmd(tox, friend_number, (const char*)message);
 	return;
     }
     else if(0 == memcmp(message, "get", 3))

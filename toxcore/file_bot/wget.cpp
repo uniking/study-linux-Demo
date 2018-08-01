@@ -17,8 +17,6 @@ linux 内核中没有实现pthread更能，所以内核中也没有pthead.h文�
 pthread_create调用内核函数clone
 */
 
-pthread_t ntid;
-
 typedef struct tox_wget {
     Tox *tox;
     uint32_t friend_number;
