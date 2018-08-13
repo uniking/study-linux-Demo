@@ -1,4 +1,5 @@
 #include <string>
+#include <stdio.h>
 using namespace std;
 
 void exec_cmd(const char* cmd)

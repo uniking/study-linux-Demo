@@ -4,6 +4,7 @@
 apt install make -y
 apt install automake -y
 apt install libtool -y
+apt install g++ -y
 git clone https://github.com/jedisct1/libsodium.git
 cd libsodium
 ./autogen.sh
