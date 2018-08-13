@@ -24,6 +24,8 @@ typedef struct DHT_node {
 const char *savedata_filename = "savedata.tox";
 const char *savedata_tmp_filename = "savedata.tox.tmp";
 
+bool g_reboot = false;
+
 #define NUM_FILE_SENDERS 256
 typedef struct {
     FILE *file;
@@ -136,6 +138,9 @@ Tox *create_tox()
         options.savedata_data = (const uint8_t*)savedata;
         options.savedata_length = fsize;
 
+	options.ipv6_enabled=false;
+	//options.udp_enabled=false;
+	
         tox = tox_new(&options, NULL);
 
         free(savedata);
@@ -165,6 +170,7 @@ void bootstrap(Tox *tox)
 {
     DHT_node nodes[] =
     {
+	{"111.231.81.34",		33445, "D365C98AAEBE77238535E2C0E7C667A5760B3FD929157BF85CADE05C342BB072", {0}},
         {"178.62.250.138",             33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
         {"2a03:b0c0:2:d0::16:1",       33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
         {"tox.zodiaclabs.org",         33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074", {0}},
@@ -218,7 +224,7 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 	0 == memcmp(message, "0", 1))
     {
         char help[1024];
-        sprintf(help, "1, screenshot\n2, power_butten\n3, start_dingding\n4, click_suninfo\n5, click_daka\n6, move_up_screen\n7, move_down_screen\n8, click_return\n9, click_ram x y\na, in_work\nb, out_work\nc, location x y\n");
+        sprintf(help, "1, screenshot\n2, power_butten\n3, start_dingding\n4, click_suninfo\n5, click_daka\n6, move_up_screen\n7, move_down_screen\n8, click_return\n9, click_ram x y\na, in_work\nb, out_work\nc, location x y\nr, reboot\n");
         tox_friend_send_message(tox, friend_number, type, (const uint8_t*)help, strlen(help), NULL);
         return;
     }
@@ -342,6 +348,10 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 	move_right_screen(x, y);
 	screenshot();
     }
+    else if(0 == memcmp(message, "r", 1))
+    {
+	g_reboot = true;
+    }
     //printf("%s\n", (const char*)message);
 
 
@@ -365,6 +375,8 @@ void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void 
 
 int main()
 {
+newt:
+    g_reboot = false;
     Tox *tox = create_tox();
 
     const char *name = "Ding Bot";
@@ -385,12 +397,13 @@ int main()
 
     update_savedata_file(tox);
 
-    while (1) {
+    while (!g_reboot) {
         tox_iterate(tox, NULL);
-        usleep(tox_iteration_interval(tox) * 1000);
+        usleep(tox_iteration_interval(tox) * 600);
     }
 
     tox_kill(tox);
+    goto newt;
 
     return 0;
 }

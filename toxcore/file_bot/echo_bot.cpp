@@ -189,6 +189,7 @@ void bootstrap(Tox *tox)
 {
     DHT_node nodes[] =
     {
+	{"111.231.81.34",		33445, "D365C98AAEBE77238535E2C0E7C667A5760B3FD929157BF85CADE05C342BB072", {0}},
         {"178.62.250.138",             33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
         {"2a03:b0c0:2:d0::16:1",       33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
         {"tox.zodiaclabs.org",         33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074", {0}},
@@ -225,6 +226,7 @@ void print_tox_id(Tox *tox)
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length,
                                    void *user_data)
 {
+    printf("add friend %s\n", (const char*)public_key);
     tox_friend_add_norequest(tox, public_key, NULL);
 
     update_savedata_file(tox);

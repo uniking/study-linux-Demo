@@ -8,6 +8,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <ctime>
+#include <locale>
+#include <time.h>
 
 #include <string>
 using namespace std;
@@ -58,7 +61,7 @@ void click_suninfo()
 
 void click_daka()
 {//adb shell input tap 395 1356
-	exec_cmd("adb shell input tap 395 1356");
+	exec_cmd("adb shell input tap 395 921");
 	//screenshot();
 }
 
@@ -107,12 +110,32 @@ void click_retern()
 	//screenshot();
 }
 
+void new_image_name(char* name, int length)
+{
+	struct tm* t;
+	time_t timer1;
+
+	timer1 = time(NULL);
+	t = localtime(&timer1);
+	snprintf(name, length, "screan.%02d.%02d.%02d.%02d.png", t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+}
+
 void screenshot()
 {
 	exec_cmd("adb shell /system/bin/screencap -p /sdcard/screenshot.png");
-	sleep(2);
+	exec_cmd("rm ./screenshot.png");
+	sleep(1);
 	exec_cmd("adb pull /sdcard/screenshot.png ./screenshot.png");
-	sleep(2);
+	sleep(1);
 
-	file_send(ding_tox, ding_friend_number, "./screenshot.png");
+	char imagename[64];
+	new_image_name(imagename, 64);
+
+	char cmd[128];
+	snprintf(cmd, 128, "convert -sample 25%%x25%% ./screenshot.png ./%s", imagename);
+	exec_cmd(cmd);
+
+	char path[64];
+	snprintf(path, 64, "./%s", imagename);
+	file_send(ding_tox, ding_friend_number, path);
 }
