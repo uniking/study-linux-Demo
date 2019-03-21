@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="D:/cloud/hadoop-2.8.0/share/hadoop/common/lib/slf4j-api-1.7.10.jar"/>
+	<classpathentry kind="lib" path="D:/cloud/hadoop-2.8.0/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar"/>
+	<classpathentry kind="lib" path="D:/cloud/spark-2.1.0-bin-without-hadoop/jars/spark-core_2.11-2.1.0.jar" sourcepath="D:/cloud/spark-2.1.0_src.zip"/>
+	<classpathentry kind="lib" path="D:/cloud/spark-2.1.0-bin-without-hadoop/jars/scala-compiler-2.11.8.jar"/>
+	<classpathentry kind="lib" path="D:/cloud/spark-2.1.0-bin-without-hadoop/jars/scala-library-2.11.8.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

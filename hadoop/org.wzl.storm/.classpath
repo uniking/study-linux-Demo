@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="D:/cloud/apache-storm-1.1.0/lib/storm-core-1.1.0.jar" sourcepath="D:/cloud/apache-storm-1.1.0_src.zip"/>
+	<classpathentry kind="lib" path="D:/cloud/apache-storm-1.1.0/external/storm-kafka/storm-kafka-1.1.0.jar"/>
+	<classpathentry kind="lib" path="D:/cloud/kafka_2.11-0.10.1.0/libs/kafka_2.11-0.10.1.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/cloud/apache-commons/org-apache-commons-logging.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

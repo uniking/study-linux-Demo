@@ -53,15 +53,27 @@ void start_dingding()
 	//screenshot();
 }
 
-void click_suninfo()
+void click_suninfo(LOC_X_Y* l)
 {//adb shell input tap 524 1645
 	exec_cmd("adb shell input tap 524 1645");
+	l->x=524;
+	l->y=1645;
 	//screenshot();
 }
 
-void click_daka()
+void click_daka(LOC_X_Y* l)
 {//adb shell input tap 395 1356
-	exec_cmd("adb shell input tap 395 921");
+	exec_cmd("adb shell input tap 400 921");
+	l->x=400;
+	l->y=921;
+	//screenshot();
+}
+
+void click_daka2(LOC_X_Y* l)
+{//adb shell input tap 395 1356
+	exec_cmd("adb shell input tap 400 1260");
+	l->x=400;
+	l->y=1260;
 	//screenshot();
 }
 
@@ -94,14 +106,18 @@ void move_right_screen(int x, int y)
 	//screenshot();
 }
 
-void in_work()
+void in_work(LOC_X_Y* l)
 {//adb shell input tap $(($rx+568)) 704
 	exec_cmd("adb shell input tap 568 704");
+	l->x=568;
+	l->y=704;
 }
 
-void out_work()
+void out_work(LOC_X_Y* l)
 {//adb shell input tap $(($rx+507)) 1154
 	exec_cmd("adb shell input tap 507 1154");
+	l->x=507;
+	l->y=1154;
 }
 
 void click_retern()

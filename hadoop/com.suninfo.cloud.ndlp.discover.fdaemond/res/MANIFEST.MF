@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Name: com.suninfo.cloud.ndlp.discover.fdaemond
+Specification-Title: client of discover, read message from kafak and write log to kafka
+Specification-Version: 1.0.1
+Specification-Vendor: "http://www.suninfo.com/"
+Implementation-Title: ndlp.discover.fdaemond
+Implementation-Version: 1.0.1
+Implementation-Vendor: "http://www.suninfo.com/"

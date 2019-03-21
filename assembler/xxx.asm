@@ -3,6 +3,5 @@
 .globl _start
 
 _start:
-	xor %eax,%eax
-	nop
-	nop
+	jmp 0x12345678
+	ret

@@ -19,6 +19,8 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
+getchar();
+
 	size_t uFileSize  = mm.GetSize();
 	const char* pData = (char*)mm.GetData();
 	if(uFileSize <=0 || NULL == pData)
@@ -29,6 +31,7 @@ int main(int argc, char* argv[])
 
 	FILE*  pNewFile  = fopen(szFileNew, "w");
 	fwrite(pData, sizeof(char), uFileSize, pNewFile);
+	
 	fclose(pNewFile);
 	pNewFile = NULL;
 

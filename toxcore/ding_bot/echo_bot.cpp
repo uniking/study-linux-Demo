@@ -218,13 +218,14 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 	
     ding_tox = tox;
     ding_friend_number = friend_number;
+    LOC_X_Y loc = {0};
 
     printf("get msg: %s\n", (const char*)message);
     if(0 == strncmp((const char*)message, "help", 4) ||
 	0 == memcmp(message, "0", 1))
     {
         char help[1024];
-        sprintf(help, "1, screenshot\n2, power_butten\n3, start_dingding\n4, click_suninfo\n5, click_daka\n6, move_up_screen\n7, move_down_screen\n8, click_return\n9, click_ram x y\na, in_work\nb, out_work\nc, location x y\nr, reboot\n");
+        sprintf(help, "1, screenshot\n2, power_butten\n3, start_dingding\n4, click_suninfo\n5, click_daka\n6, move_up_screen\n7, move_down_screen\n8, click_return\n9, click_ram x y\na, in_work\nb, out_work\nc, location x y\nd, daka2\nr, reboot\n");
         tox_friend_send_message(tox, friend_number, type, (const uint8_t*)help, strlen(help), NULL);
         return;
     }
@@ -242,11 +243,11 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
     }
     else if(0 == memcmp(message, "4", 1))
     {
-	click_suninfo();
+	click_suninfo(&loc);
     }
     else if(0 == memcmp(message, "5", 1))
     {
-	click_daka();
+	click_daka2(&loc);
     }
     else if(0 == memcmp(message, "6", 1))
     {
@@ -301,11 +302,11 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
     }
     else if(0 == memcmp(message, "a", 1))
     {
-	in_work();
+	in_work(&loc);
     }
     else if(0 == memcmp(message, "b", 1))
     {
-	out_work();
+	out_work(&loc);
     }
     else if(0 == memcmp(message, "c", 1))
     {
@@ -348,14 +349,24 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 	move_right_screen(x, y);
 	screenshot();
     }
+    else if(0 == memcmp(message, "d", 1))
+    {
+	click_daka(&loc);
+    }
     else if(0 == memcmp(message, "r", 1))
     {
 	g_reboot = true;
     }
     //printf("%s\n", (const char*)message);
 
+    char msg[64];
+    msg[0]=0;
+    if(loc.x != 0)
+        snprintf(msg, 64, "ok, x=%d y=%d\n", loc.x, loc.y);
+    else
+    	strcat(msg, "ok\n");
 
-    tox_friend_send_message(tox, friend_number, type, (const uint8_t*)"ok", 2, NULL);
+    tox_friend_send_message(tox, friend_number, type, (const uint8_t*)msg, strlen(msg), NULL);
 }
 
 void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void *user_data)

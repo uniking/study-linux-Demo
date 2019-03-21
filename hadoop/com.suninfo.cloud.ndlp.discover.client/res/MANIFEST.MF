@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Name: com.suninfo.cloud.ndlp.discover.client
+Specification-Title: client lib of discover
+Specification-Version: 1.0.1
+Specification-Vendor: "http://www.suninfo.com/"
+Implementation-Title: ndlp.discover.client
+Implementation-Version: 1.0.1
+Implementation-Vendor: "http://www.suninfo.com/"
